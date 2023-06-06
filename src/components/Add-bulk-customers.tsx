@@ -3,13 +3,22 @@ import React, { useState, useEffect } from "react";
 import css from "@/styles/Add-customer.module.scss";
 import Input, { FileUpload, ImgUpload } from "./Input";
 import { useForm, useInput } from "use-manage-form";
-import { Button, Checkbox, Icon, Message, Table } from "semantic-ui-react";
+import {
+  Button,
+  Checkbox,
+  CheckboxProps,
+  Icon,
+  Message,
+  Table,
+} from "semantic-ui-react";
 import {
   clearSimilarArrayObjects,
+  compareTwoArrays,
   parseUploadedFile,
   validateProperties,
 } from "@/utils/utils";
-import { CustomerType, EachCustomerType } from "../../types";
+import { CustomerType, EachCustomerType, ErrorTableType } from "../../types";
+import { ErrorTable } from "@/utils/classes";
 
 const customerProperties = ["name", "address", "phone", "email"];
 
@@ -17,9 +26,12 @@ const EachRow: React.FC<EachCustomerType> | (() => null) = ({
   data,
   update,
   deleteItem,
+  approved,
+  onCheckChange,
 }) => {
   // HOOKS
   const [editing, setEditing] = useState(false);
+  const [checked, setChecked] = useState(false);
   const {
     value: fullname,
     isValid: nameIsValid,
@@ -86,6 +98,13 @@ const EachRow: React.FC<EachCustomerType> | (() => null) = ({
     reset();
     setEditing(false);
   };
+  const checkChangeHandler = (
+    e: React.FormEvent<HTMLInputElement>,
+    { checked }: CheckboxProps
+  ) => {
+    setChecked(checked || false);
+    onCheckChange(data, checked || false);
+  };
 
   useEffect(() => {
     onNameChange(data.name?.toString());
@@ -94,6 +113,9 @@ const EachRow: React.FC<EachCustomerType> | (() => null) = ({
     onPhoneChange(data.phone?.toString());
     executeBlurHandlers();
   }, [editing]);
+  useEffect(() => {
+    setChecked(approved);
+  }, [approved]);
 
   if (editing)
     return (
@@ -213,7 +235,12 @@ const EachRow: React.FC<EachCustomerType> | (() => null) = ({
         }
       >
         <Table.Cell collapsing>
-          <Checkbox slider disabled={!isValidatedStrictly} />
+          <Checkbox
+            slider
+            disabled={!isValidatedStrictly}
+            checked={checked}
+            onChange={checkChangeHandler}
+          />
         </Table.Cell>
         <Table.Cell>{data.name}</Table.Cell>
         <Table.Cell>{data.email}</Table.Cell>
@@ -252,6 +279,13 @@ const AddBulkCustomers = () => {
   const validExtensions = ["json", "xlsx"];
   // HOOKS
   const [customers, setCustomers] = useState<CustomerType[] | null>(null);
+  const [selectedCustomers, setSelectedCustomers] = useState<CustomerType[]>(
+    []
+  );
+  const [errorList, setErrorList] = useState<ErrorTableType<CustomerType>[]>(
+    []
+  );
+  const [approveAll, setApproveAll] = useState(false);
   const {
     value: uploadedFile,
     inputIsInValid: uploadedFileIsInValid,
@@ -298,6 +332,54 @@ const AddBulkCustomers = () => {
         (eachCustomer) => eachCustomer.email !== email
       ) || []),
     ]);
+  };
+  const onItemCheckChange = (customer: CustomerType, checked: boolean) => {
+    if (checked) {
+      setSelectedCustomers((prevSelectedCustomers) => [
+        ...prevSelectedCustomers,
+        customer,
+      ]);
+    } else {
+      setSelectedCustomers((prevSelectedCustomers) =>
+        prevSelectedCustomers?.filter(
+          (eachCustomer) => eachCustomer.email !== customer?.email
+        )
+      );
+    }
+  };
+  const uploadCustomers = () => {
+    const processedCustomers = [];
+    // LOOP THROUGH ALL THE SELECTED CUSTOMERS AND VALIDATE EACH OF THEM
+    for (const customer of selectedCustomers) {
+      const isValid = validateProperties({
+        properties: customerProperties,
+        object: customer,
+        strict: true,
+      });
+      // IF CUSTOMER IS VALIDATED
+      if (isValid) {
+        // ADD CUSTOMER TO LIST OF VALIDATED CUSTOMERS
+        processedCustomers.push(customer);
+      }
+      // IF CUSTOMER IS NOT VALIDATED
+      else {
+        // ADD ERROR MESSAGE TO ERROR LIST
+        setErrorList((prevErrors) => [
+          ...prevErrors,
+          new ErrorTable<CustomerType>(
+            `User with name: "${customer.name}" and email: "${customer.email}" was not uploaded due to incomplete details`
+          ),
+        ]);
+      }
+    }
+    // REMOVE UPLOADED CUSTOMERS FROM THE LIST OF CUSTOMERS
+    const sortedCustomers = compareTwoArrays<CustomerType, CustomerType>(
+      customers || [],
+      processedCustomers,
+      "email"
+    );
+    // UPDATE THE CUSTOMERS LIST
+    setCustomers(sortedCustomers);
   };
 
   useEffect(() => {
@@ -347,6 +429,8 @@ const AddBulkCustomers = () => {
                   key={customer.email}
                   update={updateCustomer}
                   deleteItem={deleteCustomer}
+                  approved={approveAll}
+                  onCheckChange={onItemCheckChange}
                 />
               ))}
             </Table.Body>
@@ -361,19 +445,33 @@ const AddBulkCustomers = () => {
                     labelPosition="left"
                     positive
                     size="small"
+                    onClick={uploadCustomers}
                   >
                     <Icon name="cloud" /> Upload Customers
                   </Button>
-                  <Button size="small" primary>
+                  <Button
+                    size="small"
+                    primary
+                    onClick={() => setApproveAll(true)}
+                  >
                     Approve all
                   </Button>
-                  <Button size="small" negative>
+                  <Button
+                    size="small"
+                    negative
+                    onClick={() => setApproveAll(false)}
+                  >
                     Disapprove all
                   </Button>
                 </Table.HeaderCell>
               </Table.Row>
             </Table.Footer>
           </Table>
+        </div>
+        <div className={css["error-table-container"]}>
+          {errorList.map((error) => (
+            <p>{error.message}</p>
+          ))}
         </div>
       </div>
     </section>

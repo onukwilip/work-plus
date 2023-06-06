@@ -6,3 +6,7 @@ export class MenuClass {
     public subMenus?: MenuClass[]
   ) {}
 }
+
+export class ErrorTable<T> {
+  constructor(public message: string, public item?: T) {}
+}

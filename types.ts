@@ -54,4 +54,11 @@ export type EachCustomerType = {
   data: CustomerType;
   update: (e: CustomerType) => void;
   deleteItem: (id: string) => void;
+  approved: boolean;
+  onCheckChange: (customer: CustomerType, checked: boolean) => void;
+};
+
+export type ErrorTableType<T> = {
+  message: string;
+  item?: T;
 };

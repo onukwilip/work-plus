@@ -86,3 +86,24 @@ export const validateProperties = ({
   if (propertyNotExist === properties?.length) return false;
   return true;
 };
+
+export const compareTwoArrays = <arr1T, arr2T>(
+  arr1: (arr1T | any)[],
+  arr2: (arr2T | any)[],
+  key: string | number
+) => {
+  const result: arr1T[] = [];
+  for (const value of arr1) {
+    const arr2HasValue =
+      arr2.findIndex(
+        (value2) =>
+          typeof value2 === "object" &&
+          typeof value === "object" &&
+          value2?.[key] === value?.[key]
+      ) !== -1;
+    if (arr2HasValue) continue;
+    result.push(value);
+  }
+
+  return result;
+};
