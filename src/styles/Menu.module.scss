@@ -1,0 +1,87 @@
+@import "./config.scss";
+
+div.menu {
+  width: 55px;
+  padding: 10px;
+  transition: 500ms;
+  background: lighten(nth($pry-colors, 4), 2);
+  height: 100%;
+  box-shadow: $shadow;
+  overflow-x: hidden;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  ul {
+    @include flex(center, start, 10px, column);
+    padding: 0;
+    list-style-type: none;
+    li.each-menu {
+      width: 100%;
+      @include flex(start, start, 5px, column);
+      a {
+        @include flex(center, start, 10px, row);
+        text-transform: capitalize;
+        color: nth($pry-colors, 2);
+        width: auto;
+        transition: 200ms;
+        &:hover {
+          margin-left: 1rem;
+          i {
+            background-color: white;
+            color: nth($pry-colors, 2);
+            box-shadow: 0 0 4px rgba(nth($pry-colors, 2), 0.2);
+          }
+        }
+        i {
+          @include flex(center, center, 0, row);
+          padding: 10px;
+          background-color: nth($pry-colors, 2);
+          color: nth($pry-colors, 4);
+          border-radius: 50%;
+          transition: 200ms;
+        }
+      }
+      .sub-menu-container {
+        background: lighten(nth($pry-colors, 3), 25);
+        border-radius: 10px;
+        a:hover {
+          i {
+            background-color: transparent;
+            color: nth($pry-colors, 2);
+            box-shadow: none;
+          }
+        }
+        i {
+          @include flex(center, center, 0, row);
+          padding: 10px;
+          background-color: transparent;
+          color: nth($pry-colors, 2);
+        }
+      }
+    }
+  }
+  span {
+    display: none;
+    min-width: 100px;
+  }
+  &:hover {
+    width: 205px;
+    background: linear-gradient(
+      120deg,
+      lighten(nth($pry-colors, 4), 2),
+      darken(nth($pry-colors, 4), 10)
+    );
+    ul li.each-menu .sub-menu-container {
+      box-sizing: content-box;
+      padding: 0 10px;
+      overflow-x: hidden;
+    }
+    &::-webkit-scrollbar {
+      display: block;
+      width: 3px;
+    }
+    span {
+      display: block;
+    }
+  }
+}

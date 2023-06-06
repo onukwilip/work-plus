@@ -1,0 +1,68 @@
+@import "./config.scss";
+
+@font-face {
+  font-family: "Gumela";
+  src: url("../fonts/Gumela Regular.otf");
+}
+
+@font-face {
+  font-family: "Travel";
+  src: url("../fonts/AirtravelerspersonaluseBdit-ow59x.otf");
+}
+
+@font-face {
+  font-family: "Satisfaction";
+  src: url("../fonts/Satisfaction-R2gM.otf");
+}
+
+@font-face {
+  font-family: "bike-to-work";
+  src: url("../fonts/BikeToWork-BW1vd.otf");
+}
+
+@font-face {
+  font-family: "font-light";
+  src: url("../fonts/Afontlightpersonaluse-9ro7.otf");
+}
+
+* {
+  font-family: "Gumela";
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input {
+  font-family: "Gumela" !important;
+}
+
+em {
+  font-style: normal;
+}
+
+body {
+  overflow-x: hidden;
+  // overflow-y: hidden;
+  margin: 0;
+  padding: 0;
+  word-wrap: break-word;
+  min-height: 100vh;
+  background: #000;
+
+  @include grid(1fr, minmax(auto, auto), 0);
+  #rootReactVNB,
+  .rootReactVNB {
+    display: none;
+  }
+  header {
+    height: 15vh;
+  }
+  main {
+    overflow-y: hidden;
+    min-height: 85vh;
+  }
+}

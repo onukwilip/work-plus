@@ -1,0 +1,37 @@
+@import "./config.scss";
+
+section.add-customer-tab {
+  @include flex(start, start, 3rem, column);
+  & > section {
+    width: 100%;
+  }
+}
+
+section.add-customer {
+  & > .form {
+    @include flex(start, center, 2rem, column);
+    & > .input-container {
+      width: 100%;
+      @include grid(0.5fr 1fr 1fr, auto, 1.5rem);
+      & > div {
+        @include flex(start, center, 10px, column);
+      }
+    }
+    & > .actions {
+      button {
+        width: 120px !important;
+      }
+    }
+  }
+}
+
+section.add-bulk-customers {
+  & > .body {
+    .file-upload-container {
+      @include flex(center, center, 1rem, column);
+      code {
+        cursor: no-drop;
+      }
+    }
+  }
+}
