@@ -9,7 +9,6 @@ section.dashboard {
   }
   & > div.left {
     flex: 0;
-    // width: 100%;
   }
   & > div.right {
     padding: 1.5rem;
@@ -17,6 +16,14 @@ section.dashboard {
     overflow-y: auto;
     &::-webkit-scrollbar {
       width: 5px;
+    }
+    @include media(max, 520px) {
+      padding: 1.5rem 5px;
+    }
+  }
+  @include media(max, 480px) {
+    & > div.left {
+      display: none;
     }
   }
 }

@@ -62,15 +62,12 @@ div.menu {
   }
   span {
     display: none;
-    min-width: 100px;
+    min-width: 120px;
+    white-space: nowrap;
   }
   &:hover {
-    width: 205px;
-    background: linear-gradient(
-      120deg,
-      lighten(nth($pry-colors, 4), 2),
-      darken(nth($pry-colors, 4), 10)
-    );
+    width: 230px;
+    background: linear-gradient(120deg, lighten(nth($pry-colors, 4), 2), darken(nth($pry-colors, 4), 10));
     ul li.each-menu .sub-menu-container {
       box-sizing: content-box;
       padding: 0 10px;

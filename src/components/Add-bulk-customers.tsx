@@ -20,6 +20,7 @@ import {
 } from "@/utils/utils";
 import { CustomerType, EachCustomerType, ErrorLogsType } from "../../types";
 import { ErrorTable } from "@/utils/classes";
+import useMessage from "@/hooks/use-message";
 
 const customerProperties = ["name", "address", "phone", "email"];
 
@@ -282,6 +283,14 @@ const AddBulkCustomers = () => {
   const validExtensions = ["json", "xlsx"];
   // HOOKS
   const [customers, setCustomers] = useState<CustomerType[] | null>(null);
+  const {
+    displayMessage: displaySuccess,
+    message: successMsg,
+    show: showSuccessMsg,
+  } = useMessage({
+    message: "Customers successfully uploaded",
+    timeout: 1000 * 5,
+  });
   const [selectedCustomers, setSelectedCustomers] = useState<
     Record<string, CustomerType>
   >({});
@@ -378,15 +387,14 @@ const AddBulkCustomers = () => {
       processedCustomers,
       "email"
     );
-    console.log("PROCESSED", processedCustomers);
-    console.log("SELECTED", selectedCustomers);
-    console.log("ALL", customers);
     // DISSAPROVE ALL UPLOADED CUSTOMERS
     setApproveAll(false);
     // UPDATE THE CUSTOMERS LIST
     setCustomers(sortedCustomers);
     // REMOVE ALL ITEMS FROM THE LIST OF SELECTED CUSTOMERS
     setSelectedCustomers({});
+    // DISPLAY SUCCES MESSAGE
+    displaySuccess();
   };
   const onApproveAll = () => {
     if (!customers) return;
@@ -424,6 +432,9 @@ const AddBulkCustomers = () => {
     setApproveAll(false);
     setSelectedCustomers({});
   };
+  const clearAllErrorLogs = () => {
+    setErrorLogs([]);
+  };
 
   useEffect(() => {
     updateCustomers();
@@ -450,7 +461,6 @@ const AddBulkCustomers = () => {
             />
           )}
         </div>
-
         <div className={css["uploaded-customers-container"]}>
           <Table compact celled definition>
             <Table.Header>
@@ -488,6 +498,7 @@ const AddBulkCustomers = () => {
                     positive
                     size="small"
                     onClick={uploadCustomers}
+                    disabled={Object.keys(selectedCustomers).length < 1}
                   >
                     <Icon name="cloud" /> Upload Customers
                   </Button>
@@ -502,6 +513,7 @@ const AddBulkCustomers = () => {
             </Table.Footer>
           </Table>
         </div>
+        {showSuccessMsg && <Message success content={successMsg} />}
         <div className={css["error-logs-container"]}>
           <div className={css["error-top"]}>
             <h3>Error logs</h3>
@@ -515,7 +527,13 @@ const AddBulkCustomers = () => {
             ))}
           </div>
           <div className={css["error-bottom"]}>
-            <Button negative labelPosition="left" floated="right" icon>
+            <Button
+              negative
+              labelPosition="left"
+              floated="right"
+              icon
+              onClick={clearAllErrorLogs}
+            >
               <Icon name="x" />
               Clear logs
             </Button>
