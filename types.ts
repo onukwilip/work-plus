@@ -58,7 +58,8 @@ export type EachCustomerType = {
   onCheckChange: (customer: CustomerType, checked: boolean) => void;
 };
 
-export type ErrorTableType<T> = {
+export type ErrorLogsType<T> = {
+  date: Date;
   message: string;
   item?: T;
 };

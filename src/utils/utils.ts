@@ -107,3 +107,17 @@ export const compareTwoArrays = <arr1T, arr2T>(
 
   return result;
 };
+
+export const convertArrToObj = <T extends Record<any, any>>(
+  arr: T[],
+  key: string | number
+) => {
+  const result: Record<string | number, T> = {};
+  for (const item of arr) {
+    if (!Array.isArray(item) && typeof item === "object") {
+      result[item[key]] = item;
+    }
+  }
+
+  return result;
+};

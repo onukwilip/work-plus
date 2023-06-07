@@ -14,10 +14,11 @@ import {
 import {
   clearSimilarArrayObjects,
   compareTwoArrays,
+  convertArrToObj,
   parseUploadedFile,
   validateProperties,
 } from "@/utils/utils";
-import { CustomerType, EachCustomerType, ErrorTableType } from "../../types";
+import { CustomerType, EachCustomerType, ErrorLogsType } from "../../types";
 import { ErrorTable } from "@/utils/classes";
 
 const customerProperties = ["name", "address", "phone", "email"];
@@ -114,7 +115,9 @@ const EachRow: React.FC<EachCustomerType> | (() => null) = ({
     executeBlurHandlers();
   }, [editing]);
   useEffect(() => {
-    setChecked(approved);
+    if (isValidatedStrictly) {
+      setChecked(approved);
+    }
   }, [approved]);
 
   if (editing)
@@ -279,12 +282,10 @@ const AddBulkCustomers = () => {
   const validExtensions = ["json", "xlsx"];
   // HOOKS
   const [customers, setCustomers] = useState<CustomerType[] | null>(null);
-  const [selectedCustomers, setSelectedCustomers] = useState<CustomerType[]>(
-    []
-  );
-  const [errorList, setErrorList] = useState<ErrorTableType<CustomerType>[]>(
-    []
-  );
+  const [selectedCustomers, setSelectedCustomers] = useState<
+    Record<string, CustomerType>
+  >({});
+  const [errorLogs, setErrorLogs] = useState<ErrorLogsType<CustomerType>[]>([]);
   const [approveAll, setApproveAll] = useState(false);
   const {
     value: uploadedFile,
@@ -335,39 +336,38 @@ const AddBulkCustomers = () => {
   };
   const onItemCheckChange = (customer: CustomerType, checked: boolean) => {
     if (checked) {
-      setSelectedCustomers((prevSelectedCustomers) => [
+      setSelectedCustomers((prevSelectedCustomers) => ({
         ...prevSelectedCustomers,
-        customer,
-      ]);
+        ...{ [customer.email]: customer },
+      }));
     } else {
-      setSelectedCustomers((prevSelectedCustomers) =>
-        prevSelectedCustomers?.filter(
-          (eachCustomer) => eachCustomer.email !== customer?.email
-        )
-      );
+      const oldSelectedCustomers = { ...selectedCustomers };
+      delete oldSelectedCustomers[customer.email];
+      setSelectedCustomers({ ...oldSelectedCustomers });
     }
   };
   const uploadCustomers = () => {
     const processedCustomers = [];
     // LOOP THROUGH ALL THE SELECTED CUSTOMERS AND VALIDATE EACH OF THEM
-    for (const customer of selectedCustomers) {
+    for (const key in selectedCustomers) {
       const isValid = validateProperties({
         properties: customerProperties,
-        object: customer,
+        object: selectedCustomers[key],
         strict: true,
       });
       // IF CUSTOMER IS VALIDATED
       if (isValid) {
         // ADD CUSTOMER TO LIST OF VALIDATED CUSTOMERS
-        processedCustomers.push(customer);
+        processedCustomers.push(selectedCustomers[key]);
       }
       // IF CUSTOMER IS NOT VALIDATED
       else {
         // ADD ERROR MESSAGE TO ERROR LIST
-        setErrorList((prevErrors) => [
+        setErrorLogs((prevErrors) => [
           ...prevErrors,
           new ErrorTable<CustomerType>(
-            `User with name: "${customer.name}" and email: "${customer.email}" was not uploaded due to incomplete details`
+            new Date(),
+            `User with name: "${selectedCustomers[key].name}" and email: "${selectedCustomers[key].email}" was not uploaded due to incomplete details`
           ),
         ]);
       }
@@ -378,8 +378,51 @@ const AddBulkCustomers = () => {
       processedCustomers,
       "email"
     );
+    console.log("PROCESSED", processedCustomers);
+    console.log("SELECTED", selectedCustomers);
+    console.log("ALL", customers);
+    // DISSAPROVE ALL UPLOADED CUSTOMERS
+    setApproveAll(false);
     // UPDATE THE CUSTOMERS LIST
     setCustomers(sortedCustomers);
+    // REMOVE ALL ITEMS FROM THE LIST OF SELECTED CUSTOMERS
+    setSelectedCustomers({});
+  };
+  const onApproveAll = () => {
+    if (!customers) return;
+    setApproveAll(true);
+    const approvedCustomers: CustomerType[] = [];
+    for (const customer of customers) {
+      const isValid = validateProperties({
+        properties: customerProperties,
+        object: customer,
+        strict: true,
+      });
+      // IF CUSTOMER IS VALIDATED
+      if (isValid) {
+        // ADD CUSTOMER TO LIST OF VALIDATED CUSTOMERS
+        approvedCustomers.push(customer);
+      }
+      // IF CUSTOMER IS NOT VALIDATED
+      else {
+        // ADD ERROR MESSAGE TO ERROR LIST
+        setErrorLogs((prevErrors) => [
+          ...prevErrors,
+          new ErrorTable<CustomerType>(
+            new Date(),
+            `User with name: "${customer.name}" and email: "${customer.email}" could'nt be approved due to incomplete details`
+          ),
+        ]);
+      }
+    }
+    setSelectedCustomers((prevSelectedCustomers) => ({
+      ...prevSelectedCustomers,
+      ...convertArrToObj(approvedCustomers, "email"),
+    }));
+  };
+  const onDissaproveAll = () => {
+    setApproveAll(false);
+    setSelectedCustomers({});
   };
 
   useEffect(() => {
@@ -407,8 +450,7 @@ const AddBulkCustomers = () => {
             />
           )}
         </div>
-        <br />
-        <br />
+
         <div className={css["uploaded-customers-container"]}>
           <Table compact celled definition>
             <Table.Header>
@@ -449,18 +491,10 @@ const AddBulkCustomers = () => {
                   >
                     <Icon name="cloud" /> Upload Customers
                   </Button>
-                  <Button
-                    size="small"
-                    primary
-                    onClick={() => setApproveAll(true)}
-                  >
+                  <Button size="small" primary onClick={onApproveAll}>
                     Approve all
                   </Button>
-                  <Button
-                    size="small"
-                    negative
-                    onClick={() => setApproveAll(false)}
-                  >
+                  <Button size="small" negative onClick={onDissaproveAll}>
                     Disapprove all
                   </Button>
                 </Table.HeaderCell>
@@ -468,10 +502,24 @@ const AddBulkCustomers = () => {
             </Table.Footer>
           </Table>
         </div>
-        <div className={css["error-table-container"]}>
-          {errorList.map((error) => (
-            <p>{error.message}</p>
-          ))}
+        <div className={css["error-logs-container"]}>
+          <div className={css["error-top"]}>
+            <h3>Error logs</h3>
+          </div>
+          <div className={css["error-logs"]}>
+            {errorLogs.map((error) => (
+              <p>
+                <span>{error.date?.toLocaleTimeString()}</span>
+                <span>{error.message}</span>
+              </p>
+            ))}
+          </div>
+          <div className={css["error-bottom"]}>
+            <Button negative labelPosition="left" floated="right" icon>
+              <Icon name="x" />
+              Clear logs
+            </Button>
+          </div>
         </div>
       </div>
     </section>

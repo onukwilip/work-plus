@@ -8,5 +8,5 @@ export class MenuClass {
 }
 
 export class ErrorTable<T> {
-  constructor(public message: string, public item?: T) {}
+  constructor(public date: Date, public message: string, public item?: T) {}
 }
