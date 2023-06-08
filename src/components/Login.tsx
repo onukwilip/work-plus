@@ -6,6 +6,7 @@ import Input from "./Input";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import { Engine, IOptions, RecursivePartial } from "tsparticles-engine";
+import { useRouter } from "next/navigation";
 
 const ParticlesComponent = () => {
   // using useMemo is not mandatory, but it's recommended since this value can be memoized if static
@@ -72,12 +73,17 @@ const ParticlesComponent = () => {
 };
 
 const Login = () => {
+  const router = useRouter();
+  const submitHandler = () => {
+    router.replace("/dashboard");
+  };
+
   return (
     <>
       <section className={css.login}>
         <div className={css.modal}>
           <h1>LOGIN</h1>
-          <Form className={css.form}>
+          <Form className={css.form} onSubmit={submitHandler}>
             <Input
               placeholder="Username"
               value=""
