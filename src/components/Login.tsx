@@ -7,6 +7,7 @@ import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import { Engine, IOptions, RecursivePartial } from "tsparticles-engine";
 import { useRouter } from "next/navigation";
+import { useInput } from "use-manage-form";
 
 const ParticlesComponent = () => {
   // using useMemo is not mandatory, but it's recommended since this value can be memoized if static
@@ -74,6 +75,27 @@ const ParticlesComponent = () => {
 
 const Login = () => {
   const router = useRouter();
+  const {
+    value: email,
+    isValid: emailIsValid,
+    inputIsInValid: emailIsInValid,
+    onChange: onEmailChange,
+    onBlur: onEmailBlur,
+    reset: resetEmail,
+  } = useInput<string>(
+    (value) => value?.trim() !== "" && (value?.includes("@") || false)
+  );
+  const {
+    value: password,
+    isValid: passwordIsValid,
+    inputIsInValid: passwordIsInValid,
+    onChange: onPasswordChange,
+    onBlur: onPasswordBlur,
+    reset: resetPassword,
+  } = useInput<string>(
+    (value) => typeof value === "string" && value?.length >= 8
+  );
+
   const submitHandler = () => {
     router.replace("/dashboard");
   };
@@ -86,25 +108,37 @@ const Login = () => {
           <Form className={css.form} onSubmit={submitHandler}>
             <Input
               placeholder="Username"
-              value=""
+              value={email}
               label="Username"
-              onBlur={() => {}}
-              onChange={() => {}}
+              onBlur={onEmailBlur as any}
+              onChange={(e) => onEmailChange(e?.target?.value)}
               id="username"
               type="text"
               name="username"
               icon="fa-regular fa-user"
+              error={
+                emailIsInValid && {
+                  content: "Input cannot be empty and must be a valid email",
+                  position: { right: "0" },
+                }
+              }
             />
             <Input
               placeholder="Password"
-              value=""
+              value={password}
               label="Password"
-              onBlur={() => {}}
-              onChange={() => {}}
+              onBlur={onPasswordBlur as any}
+              onChange={(e) => onPasswordChange(e?.target?.value)}
               id="pasword"
               type="password"
               name="password"
               icon="icon lock"
+              error={
+                passwordIsInValid && {
+                  content: "Password must be greater or equal to 8 characters",
+                  position: { right: "0" },
+                }
+              }
             />
             <div className={css["btn-container"]}>
               <Button animated className={css.btn}>
