@@ -140,7 +140,8 @@ const EachMobileMenu: React.FC<{
 }> = ({ menu, submenu = false, index }) => {
   const [expand, setExpand] = useState(false);
   const icon = useRef<HTMLElement>(null);
-  const isSmaller = window.innerWidth <= 395;
+  let isSmaller = typeof window !== "undefined" && window?.innerWidth <= 395;
+
   const eachMenuRef = useRef<HTMLLIElement>(null);
   const toogleExpand = () => {
     setExpand((prev) => !prev);
@@ -187,7 +188,7 @@ const EachMobileMenu: React.FC<{
 
   useEffect(() => {
     document?.addEventListener("click", onDocumentClick);
-
+    isSmaller = window?.innerWidth <= 395;
     return () => {
       document?.removeEventListener("click", onDocumentClick);
     };
