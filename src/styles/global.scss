@@ -51,8 +51,6 @@ body {
   padding: 0;
   word-wrap: break-word;
   min-height: 100vh;
-  background: #000;
-
   @include grid(1fr, minmax(auto, auto), 0);
   #rootReactVNB,
   .rootReactVNB {
