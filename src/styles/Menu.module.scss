@@ -8,6 +8,7 @@ div.menu {
   height: 100%;
   box-shadow: $shadow;
   overflow-x: hidden;
+  z-index: 10;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -19,7 +20,8 @@ div.menu {
       width: 100%;
       @include flex(start, start, 5px, column);
       a {
-        @include flex(center, start, 10px, row);
+        // @include flex(center, start, 10px, row);
+        @include flex(center, start, 0, row);
         text-transform: capitalize;
         color: nth($pry-colors, 2);
         width: auto;
@@ -61,24 +63,114 @@ div.menu {
     }
   }
   span {
-    display: none;
-    min-width: 120px;
+    // display: none;
+    // width: 120px;
+    width: 0;
+    overflow-x: hidden;
     white-space: nowrap;
+    transition: 500ms;
   }
   &:hover {
     width: 230px;
     background: linear-gradient(120deg, lighten(nth($pry-colors, 4), 2), darken(nth($pry-colors, 4), 10));
-    ul li.each-menu .sub-menu-container {
-      box-sizing: content-box;
-      padding: 0 10px;
-      overflow-x: hidden;
+    ul li.each-menu {
+      // NEW
+      a {
+        gap: 10px;
+      }
+      .sub-menu-container {
+        box-sizing: content-box;
+        padding: 0 10px;
+        overflow-x: hidden;
+      }
     }
     &::-webkit-scrollbar {
       display: block;
       width: 3px;
     }
     span {
-      display: block;
+      // display: block;
+      width: 120px;
     }
+  }
+  @include media(max, $tablet-width-menu) {
+    position: absolute;
+  }
+  @include media(max, $mobile-width-menu) {
+    display: none;
+  }
+}
+
+div.mobile-menu {
+  display: none;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  border-radius: 15px;
+  background: lighten(nth($pry-colors, 4), 2);
+  z-index: 10;
+  margin: 0 5px;
+  width: 97%;
+  box-shadow: $shadow;
+
+  ul.menu-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    @include flex(center, space-between, 10px, row);
+    width: 100%;
+    li.each-mobile-menu {
+      position: relative;
+      @include flex(center, center, 0, column);
+      padding: 7px;
+      div.sub-menu-container {
+        overflow-y: hidden;
+        position: absolute;
+        bottom: 4.7rem;
+        background: lighten(nth($pry-colors, 3), 25);
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+      }
+      &:hover {
+        & > a:first-of-type {
+          background-color: nth($pry-colors, 2);
+          color: nth($pry-colors, 4);
+          border-radius: 5px;
+        }
+      }
+    }
+    i {
+      font-size: 24px;
+      padding: 1rem;
+      @include flex(center, center, 0, row);
+    }
+  }
+  @include media(max, 395px) {
+    ul.menu-list {
+      overflow-x: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      li.each-mobile-menu {
+        flex-direction: row;
+        gap: 10px;
+        div.sub-menu-container {
+          position: relative;
+          bottom: 0;
+          border-radius: 10px;
+          @include flex(start, start, 0, row);
+          padding: 0;
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+  span {
+    display: none;
+  }
+  @include media(max, $mobile-width-menu) {
+    display: block;
   }
 }

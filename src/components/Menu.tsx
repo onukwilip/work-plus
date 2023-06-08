@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import css from "@/styles/Menu.module.scss";
 import { MenuClass } from "@/utils/classes";
 import Link from "next/link";
@@ -127,6 +127,119 @@ const Menu = () => {
       <ul className={css["menu-list"]}>
         {menus.map((menu, i) => (
           <EachMenu menu={menu} key={i} />
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const EachMobileMenu: React.FC<{
+  menu: MenuClass;
+  index?: number;
+  submenu?: boolean;
+}> = ({ menu, submenu = false, index }) => {
+  const [expand, setExpand] = useState(false);
+  const icon = useRef<HTMLElement>(null);
+  const isSmaller = window.innerWidth <= 395;
+  const eachMenuRef = useRef<HTMLLIElement>(null);
+  const toogleExpand = () => {
+    setExpand((prev) => !prev);
+  };
+
+  const onLinkHover = () => {
+    icon.current?.classList?.add("fa-bounce");
+  };
+
+  const onLinkMouseOut = () => {
+    icon.current?.classList?.remove("fa-bounce");
+  };
+
+  const variants1 = {
+    initial: {
+      height: 0,
+    },
+    animate: {
+      height: "auto",
+    },
+    exit: {
+      height: 0,
+    },
+  };
+  const variants2 = {
+    initial: {
+      width: 0,
+    },
+    animate: {
+      width: "auto",
+    },
+    exit: {
+      width: 0,
+    },
+  };
+
+  const onDocumentClick = (e: MouseEvent) => {
+    const clickedElem = e?.target;
+
+    if (!eachMenuRef.current?.contains(clickedElem as any)) {
+      setExpand(false);
+    }
+  };
+
+  useEffect(() => {
+    document?.addEventListener("click", onDocumentClick);
+
+    return () => {
+      document?.removeEventListener("click", onDocumentClick);
+    };
+  }, []);
+
+  return (
+    <>
+      <li className={css["each-mobile-menu"]} ref={eachMenuRef}>
+        <Link
+          href={menu?.link || "/dashboard#"}
+          onMouseOver={onLinkHover}
+          onMouseOut={onLinkMouseOut}
+          onClick={toogleExpand}
+        >
+          <i className={menu?.icon} ref={icon}></i>
+          <span> {menu?.name}</span>
+        </Link>
+        <AnimatePresence>
+          {expand && (
+            <motion.div
+              className={css["sub-menu-container"]}
+              variants={!isSmaller ? variants1 : variants2}
+              initial={"initial"}
+              animate={"animate"}
+              exit={"exit"}
+            >
+              {menu?.subMenus?.map((menu, i) => (
+                <>
+                  {
+                    <EachMobileMenu
+                      menu={menu}
+                      key={i}
+                      submenu={true}
+                      index={i}
+                    />
+                  }
+                </>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </li>
+    </>
+  );
+};
+
+export const MobileMenu = () => {
+  return (
+    <div className={css["mobile-menu"]}>
+      <ul className={css["menu-list"]}>
+        {menus.map((menu, i) => (
+          <EachMobileMenu menu={menu} key={i} />
         ))}
       </ul>
     </div>

@@ -1,4 +1,4 @@
-import Menu from "@/components/Menu";
+import Menu, { MobileMenu } from "@/components/Menu";
 import css from "@/styles/Dashboard.module.scss";
 
 export const metadata = {
@@ -12,7 +12,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className={css.left}>
         <Menu />
       </div>
-      <div className={css.right}> {children}</div>
+      <div className={css.right}>
+        {children}
+        <MobileMenu />
+      </div>
     </section>
   );
 };

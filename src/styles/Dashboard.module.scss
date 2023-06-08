@@ -9,11 +9,13 @@ section.dashboard {
   }
   & > div.left {
     flex: 0;
+    position: relative;
   }
   & > div.right {
     padding: 1.5rem;
     max-height: 85dvh;
     overflow-y: auto;
+    @include flex(stretch, space-between, 1rem, column);
     &::-webkit-scrollbar {
       width: 5px;
     }
@@ -21,7 +23,12 @@ section.dashboard {
       padding: 1.5rem 5px;
     }
   }
-  @include media(max, 480px) {
+  @include media(max, $tablet-width-menu) {
+    & > div.left {
+      min-width: 55px;
+    }
+  }
+  @include media(max, $mobile-width-menu) {
     & > div.left {
       display: none;
     }
