@@ -3,6 +3,9 @@
 div.input {
   @include flex(start, start, 5px, column);
   width: 100%;
+  & > label {
+    text-transform: capitalize;
+  }
   & > .input-holder {
     width: 100%;
     cursor: text;

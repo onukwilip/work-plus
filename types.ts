@@ -50,12 +50,18 @@ export type CustomerType = {
   phone: string;
 };
 
-export type EachCustomerType = {
-  data: CustomerType;
-  update: (e: CustomerType) => void;
+export type EachRowType<T> = {
+  data: T;
+  update: (e: T) => void;
   deleteItem: (id: string) => void;
   approved: boolean;
-  onCheckChange: (customer: CustomerType, checked: boolean) => void;
+  onCheckChange: (data: T, checked: boolean) => void;
+};
+
+export type MaterialType = {
+  id: string;
+  description: string;
+  ["unit price"]: string | number;
 };
 
 export type ErrorLogsType<T> = {

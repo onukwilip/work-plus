@@ -18,13 +18,13 @@ import {
   parseUploadedFile,
   validateProperties,
 } from "@/utils/utils";
-import { CustomerType, EachCustomerType, ErrorLogsType } from "../../types";
+import { CustomerType, EachRowType, ErrorLogsType } from "../../types";
 import { ErrorTable } from "@/utils/classes";
 import useMessage from "@/hooks/use-message";
 
 const customerProperties = ["name", "address", "phone", "email"];
 
-const EachRow: React.FC<EachCustomerType> | (() => null) = ({
+const EachRow: React.FC<EachRowType<CustomerType>> | (() => null) = ({
   data,
   update,
   deleteItem,
