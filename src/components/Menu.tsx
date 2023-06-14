@@ -197,15 +197,27 @@ const EachMobileMenu: React.FC<{
   return (
     <>
       <li className={css["each-mobile-menu"]} ref={eachMenuRef}>
-        <Link
-          href={menu?.link || "/dashboard#"}
-          onMouseOver={onLinkHover}
-          onMouseOut={onLinkMouseOut}
-          onClick={toogleExpand}
-        >
-          <i className={menu?.icon} ref={icon}></i>
-          <span> {menu?.name}</span>
-        </Link>
+        {menu?.link ? (
+          <Link
+            href={menu?.link}
+            onMouseOver={onLinkHover}
+            onMouseOut={onLinkMouseOut}
+            onClick={toogleExpand}
+          >
+            <i className={menu?.icon} ref={icon}></i>
+            <span> {menu?.name}</span>
+          </Link>
+        ) : (
+          <a
+            href="#"
+            onMouseOver={onLinkHover}
+            onMouseOut={onLinkMouseOut}
+            onClick={toogleExpand}
+          >
+            <i className={menu?.icon} ref={icon}></i>
+            <span> {menu?.name}</span>
+          </a>
+        )}
         <AnimatePresence>
           {expand && (
             <motion.div

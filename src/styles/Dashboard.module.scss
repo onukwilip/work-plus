@@ -13,7 +13,7 @@ section.dashboard {
   }
   & > div.right {
     padding: 1.5rem;
-    max-height: 85dvh;
+    max-height: 85vh;
     overflow-y: auto;
     @include flex(stretch, space-between, 1rem, column);
     &::-webkit-scrollbar {
