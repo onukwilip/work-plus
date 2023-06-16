@@ -1,0 +1,96 @@
+@import "./config.scss";
+
+section.view-customers-tab {
+    @include flex(start, start, 3rem, column);
+    & > section {
+        width: 100%;
+    }
+}
+
+section.view-customers {
+    .body {
+        .input {
+            width: 300px;
+            & > div {
+                width: 100%;
+            }
+        }
+        .customers-container {
+            // @include flex(start, start, 1rem, row);
+            // flex-wrap: wrap;
+            @include grid(repeat(4, 1fr), auto, 1rem);
+        }
+    }
+}
+
+div.each-customer {
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: $shadow;
+    padding: 1rem 0;
+    & > div,
+    & > ul {
+        padding: 0 1rem;
+    }
+    .img-container {
+        border-radius: 10px;
+        overflow-y: hidden;
+        @include flex(center, start, 0, column);
+        position: relative;
+        height: 200px;
+        // background: yellow;
+        .bg {
+            height: 130px;
+            background: url("../assets/images/military-gear.png");
+            width: 100%;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid nth($pry-colors, 2);
+            object-position: top;
+            position: absolute;
+            bottom: 1rem;
+        }
+    }
+    .details-container {
+        list-style-type: none;
+        @include flex(start, start, 0.7rem, column);
+        li {
+            font-size: 16px;
+            font-weight: normal;
+            color: $light-black;
+            @include flex(start, start, 10px, row);
+            i {
+                font-size: 18px;
+            }
+        }
+    }
+    .actions {
+        padding-top: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-top: thin solid $light-black;
+        @include flex(center, start, 1rem, row);
+        span {
+            font-size: 15px;
+            cursor: pointer;
+            transition: 200ms;
+            i {
+                font-size: 17px;
+            }
+            &:first-of-type {
+                color: nth($pry-colors, 3);
+            }
+            &:last-of-type {
+                color: nth($pry-colors, 5);
+            }
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+    }
+}
