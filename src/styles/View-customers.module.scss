@@ -16,15 +16,58 @@ section.view-customers {
             }
         }
         .customers-container {
-            // @include flex(start, start, 1rem, row);
-            // flex-wrap: wrap;
-            @include grid(repeat(4, 1fr), auto, 1rem);
+            @include flex(start, start, 1rem, row);
+            flex-wrap: wrap;
+
+            & > div {
+                flex: 1 1 0;
+            }
+
+            @include media(max, 921px) {
+                justify-content: center;
+            }
+
+            @include media(max, 460px) {
+                padding: 0 10px;
+                & > div {
+                    min-width: 300px;
+                    max-width: auto;
+                }
+            }
         }
+
+        // .masonry {
+        //     @include flex(start, start, 10px, row);
+        //     flex-wrap: wrap;
+        // }
+        // .each-masonry {
+        //     flex: 1 1 0;
+        //     @include media(max, 824px) {
+        //         @include flex(start, start, 10px, row);
+        //         flex-wrap: wrap;
+        //         justify-content: center;
+        //         & > div {
+        //             flex: 1 1 0;
+        //             margin-bottom: 0 !important;
+        //         }
+        //     }
+        //     & > div {
+        //         margin-bottom: 10px;
+        //     }
+        //     @include media(max, 460px) {
+        //         padding: 0 10px;
+        //         & > div {
+        //             min-width: 300px;
+        //             max-width: auto;
+        //         }
+        //     }
+        // }
     }
 }
 
 div.each-customer {
-    width: 400px;
+    min-width: 350px;
+    max-width: 600px;
     border-radius: 10px;
     box-shadow: $shadow;
     padding: 1rem 0;

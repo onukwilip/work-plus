@@ -1,10 +1,11 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import css from "@/styles/View-customers.module.scss";
-import { Input } from "semantic-ui-react";
+import { Button, Header, Image, Input, Modal } from "semantic-ui-react";
 import { CustomerType } from "../../types";
 import { motion } from "framer-motion";
 import { customers } from "@/utils/data.json";
+import { createPortal } from "react-dom";
 
 // const CustomerDetails: React.FC<{
 //   customer: { image: string } & CustomerType;
@@ -134,16 +135,77 @@ const CustomerDetails: React.FC<{
   );
 };
 
-const ViewCustomers = () => {
+const EditCustomer: React.FC<{
+  showModal: Function;
+  modalShouldOpen: boolean;
+  customer: { image: string } & CustomerType;
+}> = ({ showModal, customer, modalShouldOpen }) => {
   return (
-    <section className={css["view-customers"]}>
-      <h3>View Customers</h3>
-      <br />
-      <div className={css.body}>
-        <Input className={css.input} icon="search" placeholder="Search..." />
+    <Modal
+      onClose={() => showModal(false)}
+      onOpen={() => showModal(true)}
+      open={modalShouldOpen}
+      trigger={<Button>Show Modal</Button>}
+    >
+      <Modal.Header>Select a Photo</Modal.Header>
+      <Modal.Content image>
+        <Image size="medium" src={customer.image} wrapped />
+        <Modal.Description>
+          <Header>Default Profile Image</Header>
+          <p>
+            We've found the following gravatar image associated with your e-mail
+            address.
+          </p>
+          <p>Is it okay to use this photo?</p>
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button color="black" onClick={() => showModal(false)}>
+          Nope
+        </Button>
+        <Button
+          content="Yep, that's me"
+          labelPosition="right"
+          icon="checkmark"
+          onClick={() => showModal(false)}
+          positive
+        />
+      </Modal.Actions>
+    </Modal>
+  );
+};
+
+const ViewCustomers = () => {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <section className={css["view-customers"]}>
+        <h3>View Customers</h3>
         <br />
-        <br />
-        <div className={css["customers-container"]}>
+        <div className={css.body}>
+          <Input className={css.input} icon="search" placeholder="Search..." />
+          <br />
+          <br />
+          <div className={css["customers-container"]}>
+            {customers.map((customer, i) => (
+              <CustomerDetails
+                customer={customer}
+                index={i}
+                key={customer.email}
+              />
+            ))}
+          </div>
+          {/* <Masonry
+          breakpointCols={{
+            default: 4,
+            1200: 3,
+            // 768: 2,
+            824: 1,
+          }}
+          className={css["masonry"]}
+          columnClassName={css["each-masonry"]}
+        >
           {customers.map((customer, i) => (
             <CustomerDetails
               customer={customer}
@@ -151,9 +213,10 @@ const ViewCustomers = () => {
               key={customer.email}
             />
           ))}
+        </Masonry> */}
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
