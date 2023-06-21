@@ -1,4 +1,6 @@
 import Header from "@/components/Header";
+import PortalHandler from "@/components/PortalHandler";
+import ReduxStoreHandler from "@/components/ReduxStoreHandler";
 import "@/styles/global.scss";
 import { Inter } from "next/font/google";
 import "semantic-ui-css/semantic.min.css";
@@ -30,7 +32,10 @@ export default function RootLayout({
         <Header />
         <main>
           <div id="modal"></div>
-          {children}
+          <ReduxStoreHandler>
+            <PortalHandler />
+            {children}
+          </ReduxStoreHandler>
         </main>
       </body>
     </html>

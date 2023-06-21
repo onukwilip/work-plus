@@ -1,12 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import css from "@/styles/View-customers.module.scss";
 import { Button, Header, Image, Input, Modal } from "semantic-ui-react";
 import { CustomerType } from "../../types";
 import { motion } from "framer-motion";
 import { customers } from "@/utils/data.json";
-import { createPortal } from "react-dom";
-
+import { useDispatch } from "react-redux";
+import { modalActions } from "@/store/store";
+import EditCustomer from "./EditCustomer";
 // const CustomerDetails: React.FC<{
 //   customer: { image: string } & CustomerType;
 // }> = ({ customer }) => {
@@ -45,9 +46,19 @@ import { createPortal } from "react-dom";
 // };
 
 const CustomerDetails: React.FC<{
-  customer: { image: string } & CustomerType;
+  customer: CustomerType;
   index: number;
 }> = ({ customer, index }) => {
+  const dispatch = useDispatch();
+  const onEditClick = () => {
+    dispatch(
+      modalActions.display({
+        component: EditCustomer as FC<any>,
+        properties: { customer },
+      })
+    );
+  };
+
   const variants = {
     down: {
       y: 50,
@@ -124,7 +135,7 @@ const CustomerDetails: React.FC<{
         </motion.li>
       </ul>
       <div className={css.actions}>
-        <span>
+        <span onClick={onEditClick}>
           <i className="fa-solid fa-highlighter"></i> Edit
         </span>
         <span>
@@ -132,46 +143,6 @@ const CustomerDetails: React.FC<{
         </span>
       </div>
     </motion.div>
-  );
-};
-
-const EditCustomer: React.FC<{
-  showModal: Function;
-  modalShouldOpen: boolean;
-  customer: { image: string } & CustomerType;
-}> = ({ showModal, customer, modalShouldOpen }) => {
-  return (
-    <Modal
-      onClose={() => showModal(false)}
-      onOpen={() => showModal(true)}
-      open={modalShouldOpen}
-      trigger={<Button>Show Modal</Button>}
-    >
-      <Modal.Header>Select a Photo</Modal.Header>
-      <Modal.Content image>
-        <Image size="medium" src={customer.image} wrapped />
-        <Modal.Description>
-          <Header>Default Profile Image</Header>
-          <p>
-            We've found the following gravatar image associated with your e-mail
-            address.
-          </p>
-          <p>Is it okay to use this photo?</p>
-        </Modal.Description>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button color="black" onClick={() => showModal(false)}>
-          Nope
-        </Button>
-        <Button
-          content="Yep, that's me"
-          labelPosition="right"
-          icon="checkmark"
-          onClick={() => showModal(false)}
-          positive
-        />
-      </Modal.Actions>
-    </Modal>
   );
 };
 

@@ -23,6 +23,7 @@ div.input {
       background: transparent !important;
       border: none !important;
       outline: none !important;
+      flex: 1;
       &:-webkit-autofill,
       &:-moz-autofill {
         background: transparent !important;
@@ -128,9 +129,10 @@ div.file-upload {
   }
   .img-container {
     position: relative;
+    border-radius: 10px;
     img {
-      width: 100%;
-      height: 300px;
+      width: 200px;
+      height: 100%;
       object-fit: contain;
       object-position: top;
       border-radius: 10px;

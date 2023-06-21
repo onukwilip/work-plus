@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent } from "react";
+import { ChangeEvent, FC } from "react";
 
 export type InputType = {
   className?: string;
@@ -48,6 +48,7 @@ export type CustomerType = {
   address: string;
   email: string;
   phone: string;
+  image?: string;
 };
 
 export type EachRowType<T> = {
@@ -69,3 +70,17 @@ export type ErrorLogsType<T> = {
   message: string;
   item?: T;
 };
+
+export type SelectorType = {
+  modal: ModalType;
+};
+
+export type ModalType = {
+  show: boolean;
+  props: {
+    component: FC | FC<any> | undefined;
+    properties: Record<string, any>;
+  };
+};
+
+export type ModalPayload<T> = { component: FC<T>; properties: T };

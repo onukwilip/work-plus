@@ -1,4 +1,5 @@
 import Login from "@/components/Login";
+import PortalHandler from "@/components/PortalHandler";
 import React from "react";
 
 const Home = () => {
