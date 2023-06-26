@@ -8,6 +8,8 @@ import { CustomerType } from "../../types";
 import { useForm, useInput } from "use-manage-form";
 import Input, { ImgUpload } from "./Input";
 import css from "@/styles/EditCustomer.module.scss";
+import { editCustomerAction } from "@/store/customersReducer";
+import { AnyAction } from "redux";
 
 type EditCustomerPropsType = { customer: CustomerType };
 
@@ -107,6 +109,18 @@ const EditCustomer: FC<EditCustomerPropsType> = ({ customer }) => {
   };
   const updateCustomer = () => {
     if (!formIsValid) return executeBlurHandlers();
+
+    const editedCustomer: CustomerType = {
+      id: customer.id,
+      name: fullname || customer.name,
+      email: email || customer.email,
+      phone: phone || customer.phone,
+      image: image ? URL.createObjectURL(image) : customer.image,
+      address: address || customer.address,
+    };
+
+    // UPDATE THE CUSTOMER
+    dispatch(editCustomerAction(editedCustomer) as unknown as AnyAction);
 
     console.log(fullname, address, email, phone, image);
     reset();

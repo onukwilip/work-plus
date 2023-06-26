@@ -63,4 +63,8 @@ body {
     overflow-y: hidden;
     min-height: 85vh;
   }
+  .loader {
+    @include flex(center, center, 0, row);
+    width: 100%;
+  }
 }

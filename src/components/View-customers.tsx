@@ -1,13 +1,23 @@
 "use client";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import css from "@/styles/View-customers.module.scss";
-import { Button, Header, Image, Input, Modal } from "semantic-ui-react";
-import { CustomerType } from "../../types";
+import {
+  Button,
+  Header,
+  Image,
+  Input,
+  Message,
+  Modal,
+} from "semantic-ui-react";
+import { CustomerReducerType, CustomerType, SelectorType } from "../../types";
 import { motion } from "framer-motion";
-import { customers } from "@/utils/data.json";
-import { useDispatch } from "react-redux";
+// import { customers } from "@/utils/data.json";
+import { useDispatch, useSelector } from "react-redux";
 import { modalActions } from "@/store/store";
 import EditCustomer from "./EditCustomer";
+import { fetchCustomersAction } from "@/store/customersReducer";
+import { AnyAction } from "redux";
+import CustomLoader from "./CustomLoader";
 // const CustomerDetails: React.FC<{
 //   customer: { image: string } & CustomerType;
 // }> = ({ customer }) => {
@@ -147,7 +157,14 @@ const CustomerDetails: React.FC<{
 };
 
 const ViewCustomers = () => {
-  const [showModal, setShowModal] = useState(false);
+  const customersState: CustomerReducerType = useSelector<SelectorType>(
+    (state) => state.customers
+  ) as CustomerReducerType;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCustomersAction() as unknown as AnyAction);
+  }, []);
 
   return (
     <>
@@ -159,13 +176,27 @@ const ViewCustomers = () => {
           <br />
           <br />
           <div className={css["customers-container"]}>
-            {customers.map((customer, i) => (
-              <CustomerDetails
-                customer={customer}
-                index={i}
-                key={customer.email}
-              />
-            ))}
+            {customersState.fetching ? (
+              <>
+                <CustomLoader />
+              </>
+            ) : customersState.customers.length > 0 ? (
+              customersState.customers.map((customer, i) => (
+                <CustomerDetails
+                  customer={customer}
+                  index={i}
+                  key={customer.email}
+                />
+              ))
+            ) : (
+              <>
+                <Message
+                  icon={"404"}
+                  header="Oops...!"
+                  content="No customers found..."
+                />
+              </>
+            )}
           </div>
           {/* <Masonry
           breakpointCols={{

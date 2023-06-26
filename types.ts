@@ -49,6 +49,7 @@ export type CustomerType = {
   email: string;
   phone: string;
   image?: string;
+  id?: string;
 };
 
 export type EachRowType<T> = {
@@ -73,6 +74,7 @@ export type ErrorLogsType<T> = {
 
 export type SelectorType = {
   modal: ModalType;
+  customers: CustomerReducerType;
 };
 
 export type ModalType = {
@@ -81,6 +83,13 @@ export type ModalType = {
     component: FC | FC<any> | undefined;
     properties: Record<string, any>;
   };
+};
+
+export type CustomerReducerType = {
+  customers: CustomerType[];
+  fetching: boolean;
+  editing: boolean;
+  deleting: boolean;
 };
 
 export type ModalPayload<T> = { component: FC<T>; properties: T };
