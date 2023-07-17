@@ -66,6 +66,12 @@ export type MaterialType = {
   ["unit price"]: string | number;
 };
 
+export type VATType = {
+  id: string;
+  description: string;
+  ["unit price"]: string | number;
+};
+
 export type ErrorLogsType<T> = {
   date: Date;
   message: string;
@@ -76,6 +82,7 @@ export type SelectorType = {
   modal: ModalType;
   customers: CustomerReducerType;
   materials: MaterialsReducerType;
+  vat: VATReducerType;
 };
 
 export type ModalType = {
@@ -95,6 +102,13 @@ export type CustomerReducerType = {
 
 export type MaterialsReducerType = {
   materials: MaterialType[];
+  fetching: boolean;
+  editing: boolean;
+  deleting: boolean;
+};
+
+export type VATReducerType = {
+  vat: VATType[];
   fetching: boolean;
   editing: boolean;
   deleting: boolean;

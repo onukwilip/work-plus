@@ -132,5 +132,32 @@
       "description": "Wire",
       "unit price": 32369.89
     }
+  ],
+  "vat": [
+    {
+      "id": "64b5368051b00eef92e5fe37",
+      "unit price": 1379.23,
+      "description": "Government Tax"
+    },
+    {
+      "id": "64b53680b0237b760775ee47",
+      "unit price": 851.59,
+      "description": "Workmanship Tax"
+    },
+    {
+      "id": "64b53680556560f8845ba8dc",
+      "unit price": 2209.85,
+      "description": "Utility Tax"
+    },
+    {
+      "id": "64b53680e4d4f980d813a236",
+      "unit price": 2738.06,
+      "description": "Workmanship Tax"
+    },
+    {
+      "id": "64b5368094bdb5d18ffbf537",
+      "unit price": 2315.53,
+      "description": "Organization Tax"
+    }
   ]
 }
