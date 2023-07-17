@@ -11,7 +11,6 @@ import {
 } from "semantic-ui-react";
 import { CustomerReducerType, CustomerType, SelectorType } from "../../types";
 import { motion } from "framer-motion";
-// import { customers } from "@/utils/data.json";
 import { useDispatch, useSelector } from "react-redux";
 import { modalActions } from "@/store/store";
 import EditCustomer from "./EditCustomer";
@@ -198,24 +197,6 @@ const ViewCustomers = () => {
               </>
             )}
           </div>
-          {/* <Masonry
-          breakpointCols={{
-            default: 4,
-            1200: 3,
-            // 768: 2,
-            824: 1,
-          }}
-          className={css["masonry"]}
-          columnClassName={css["each-masonry"]}
-        >
-          {customers.map((customer, i) => (
-            <CustomerDetails
-              customer={customer}
-              index={i}
-              key={customer.email}
-            />
-          ))}
-        </Masonry> */}
         </div>
       </section>
     </>

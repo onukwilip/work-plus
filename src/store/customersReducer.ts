@@ -24,6 +24,7 @@ const customerSlice = createSlice({
       if (customerToUpdateIndex > 0) {
         store.customers[customerToUpdateIndex] = { ...payload };
       }
+      console.log("CUSTOMER INDEX", customerToUpdateIndex);
     },
     deleteCustomer: (store, { payload: id }: { payload: string }) => {
       store.customers.filter((customer) => customer.id !== id);
@@ -79,6 +80,8 @@ export const fetchCustomersAction = () => {
 };
 
 export const editCustomerAction = (customer: CustomerType) => {
+  console.log("ACTION CALLED");
+
   const editCustomer = async (dispatch: Dispatch<AnyAction>) => {
     return new Promise<boolean>((resolve, reject) => {
       // SET EDITING STATE TO TRUE
