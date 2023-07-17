@@ -93,18 +93,35 @@ const ViewVAT = () => {
     (state) => state.vat
   ) as VATReducerType;
   const dispatch = useDispatch();
+  const [vat, setVat] = useState<VATType[]>([]);
+  const searchVAT = (word: string) => {
+    const filteredVATs = vatState.vat.filter(
+      (vat) =>
+        vat.description.toLowerCase().includes(word.toLowerCase()) ||
+        vat["unit price"]?.toString().toLowerCase().includes(word.toLowerCase())
+    );
+    setVat(filteredVATs);
+  };
 
   useEffect(() => {
     dispatch(fetchVATAction() as unknown as AnyAction);
   }, []);
-
+  useEffect(() => {
+    if (Array.isArray(vatState.vat) && vatState.vat.length > 0)
+      setVat(vatState.vat);
+  }, [vatState.vat]);
   return (
     <>
       <section className={css["view-vat"]}>
         <h3>View VAT</h3>
         <br />
         <div className={css.body}>
-          <Input className={css.input} icon="search" placeholder="Search..." />
+          <Input
+            className={css.input}
+            onChange={(e) => searchVAT(e.target.value)}
+            icon="search"
+            placeholder="Search..."
+          />
           <br />
           <br />
           <div className={css["vat-container"]}>
@@ -112,8 +129,8 @@ const ViewVAT = () => {
               <>
                 <CustomLoader />
               </>
-            ) : vatState.vat.length > 0 ? (
-              vatState.vat.map((vat, i) => (
+            ) : vat.length > 0 ? (
+              vat.map((vat, i) => (
                 <VATDetails vat={vat} index={i} key={vat.id} />
               ))
             ) : (

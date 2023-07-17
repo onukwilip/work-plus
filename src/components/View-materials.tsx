@@ -94,10 +94,29 @@ const ViewMaterials = () => {
     (state) => state.materials
   ) as MaterialsReducerType;
   const dispatch = useDispatch();
+  const [materials, setMaterials] = useState<MaterialType[]>([]);
+  const searchMaterial = (word: string) => {
+    const filteredMaterials = materialsState.materials.filter(
+      (material) =>
+        material.description.toLowerCase().includes(word.toLowerCase()) ||
+        material["unit price"]
+          ?.toString()
+          .toLowerCase()
+          .includes(word.toLowerCase())
+    );
+    setMaterials(filteredMaterials);
+  };
 
   useEffect(() => {
     dispatch(fetchMaterialsAction() as unknown as AnyAction);
   }, []);
+  useEffect(() => {
+    if (
+      Array.isArray(materialsState.materials) &&
+      materialsState.materials.length > 0
+    )
+      setMaterials(materialsState.materials);
+  }, [materialsState.materials]);
 
   return (
     <>
@@ -105,7 +124,12 @@ const ViewMaterials = () => {
         <h3>View Materials</h3>
         <br />
         <div className={css.body}>
-          <Input className={css.input} icon="search" placeholder="Search..." />
+          <Input
+            className={css.input}
+            icon="search"
+            onChange={(e) => searchMaterial(e.target.value)}
+            placeholder="Search..."
+          />
           <br />
           <br />
           <div className={css["materials-container"]}>
@@ -113,8 +137,8 @@ const ViewMaterials = () => {
               <>
                 <CustomLoader />
               </>
-            ) : materialsState.materials.length > 0 ? (
-              materialsState.materials.map((material, i) => (
+            ) : materials.length > 0 ? (
+              materials.map((material, i) => (
                 <MaterialDetails
                   material={material}
                   index={i}
