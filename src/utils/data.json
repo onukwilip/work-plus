@@ -80,5 +80,57 @@
       "phone": "090909090",
       "image": "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
     }
+  ],
+  "materials": [
+    {
+      "id": "64b52fa9d88d61f1ceda6e2b",
+      "description": "Google",
+      "unit price": 48474.43
+    },
+    {
+      "id": "64b52fa9118c0a52cd758ca5",
+      "description": "Drill",
+      "unit price": 1934.17
+    },
+    {
+      "id": "64b52fa9d8b8e767b20a1745",
+      "description": "Drill",
+      "unit price": 1715.01
+    },
+    {
+      "id": "64b52fa9dac119f8ca3a21b0",
+      "description": "Google",
+      "unit price": 38421.23
+    },
+    {
+      "id": "64b52fa9da193c86a0a16e8b",
+      "description": "Steel",
+      "unit price": 7853.78
+    },
+    {
+      "id": "64b52fa95dfa0f3d77efd711",
+      "description": "Hammer",
+      "unit price": 46656.38
+    },
+    {
+      "id": "64b52fa9fb872b4ffedbe1ec",
+      "description": "Steel",
+      "unit price": 24578.88
+    },
+    {
+      "id": "64b52fa93d43c57afbe3e84e",
+      "description": "Drill",
+      "unit price": 38425.73
+    },
+    {
+      "id": "64b52fa99292704e1793a2c9",
+      "description": "Wire",
+      "unit price": 29263.57
+    },
+    {
+      "id": "64b52fa9058b9d8d80525e29",
+      "description": "Wire",
+      "unit price": 32369.89
+    }
   ]
 }

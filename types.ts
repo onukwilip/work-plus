@@ -75,6 +75,7 @@ export type ErrorLogsType<T> = {
 export type SelectorType = {
   modal: ModalType;
   customers: CustomerReducerType;
+  materials: MaterialsReducerType;
 };
 
 export type ModalType = {
@@ -87,6 +88,13 @@ export type ModalType = {
 
 export type CustomerReducerType = {
   customers: CustomerType[];
+  fetching: boolean;
+  editing: boolean;
+  deleting: boolean;
+};
+
+export type MaterialsReducerType = {
+  materials: MaterialType[];
   fetching: boolean;
   editing: boolean;
   deleting: boolean;

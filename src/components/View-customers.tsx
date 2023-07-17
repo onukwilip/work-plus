@@ -1,14 +1,7 @@
 "use client";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect } from "react";
 import css from "@/styles/View-customers.module.scss";
-import {
-  Button,
-  Header,
-  Image,
-  Input,
-  Message,
-  Modal,
-} from "semantic-ui-react";
+import { Input, Message } from "semantic-ui-react";
 import { CustomerReducerType, CustomerType, SelectorType } from "../../types";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,42 +10,7 @@ import EditCustomer from "./EditCustomer";
 import { fetchCustomersAction } from "@/store/customersReducer";
 import { AnyAction } from "redux";
 import CustomLoader from "./CustomLoader";
-// const CustomerDetails: React.FC<{
-//   customer: { image: string } & CustomerType;
-// }> = ({ customer }) => {
-//   return (
-//     <div className={css["each-customer"]}>
-//       <div className={`${css["img-container"]}`}>
-//         <div className={css.bg}></div>
-//         <img src={customer.image} alt={customer.name} />
-//       </div>
-//       <ul className={css["details-container"]}>
-//         <li>
-//           <i className="fa-regular fa-user"></i> <span>{customer.name}</span>
-//         </li>
-//         <li>
-//           <i className="fa-regular fa-envelope-open"></i>{" "}
-//           <span>{customer.email}</span>
-//         </li>
-//         <li>
-//           <i className="fa-solid fa-mobile"></i> <span>{customer.phone}</span>
-//         </li>
-//         <li>
-//           <i className="fa-regular fa-address-book"></i>{" "}
-//           <span>{customer.address}</span>
-//         </li>
-//       </ul>
-//       <div className={css.actions}>
-//         <span>
-//           <i className="fa-solid fa-highlighter"></i> Edit
-//         </span>
-//         <span>
-//           <i className="fa-regular fa-square-minus"></i> Delete
-//         </span>
-//       </div>
-//     </div>
-//   );
-// };
+import DeleteCustomer from "./DeleteCustomer";
 
 const CustomerDetails: React.FC<{
   customer: CustomerType;
@@ -64,6 +22,14 @@ const CustomerDetails: React.FC<{
       modalActions.display({
         component: EditCustomer as FC<any>,
         properties: { customer },
+      })
+    );
+  };
+  const onDeleteClick = () => {
+    dispatch(
+      modalActions.display({
+        component: DeleteCustomer as FC<any>,
+        properties: { id: customer.id, customer },
       })
     );
   };
@@ -147,7 +113,7 @@ const CustomerDetails: React.FC<{
         <span onClick={onEditClick}>
           <i className="fa-solid fa-highlighter"></i> Edit
         </span>
-        <span>
+        <span onClick={onDeleteClick}>
           <i className="fa-regular fa-square-minus"></i> Delete
         </span>
       </div>

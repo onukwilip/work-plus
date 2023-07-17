@@ -1,34 +1,34 @@
-import { customers } from "@/utils/data.json";
+import { materials } from "@/utils/data.json";
 import { AnyAction, createSlice } from "@reduxjs/toolkit";
-import { CustomerReducerType, CustomerType } from "../../types";
+import { MaterialType, MaterialsReducerType } from "../../types";
 import { Dispatch } from "react";
-import { customerActions } from "./store";
+import { materialActions } from "./store";
 
-const initialState: CustomerReducerType = {
-  customers: [],
+const initialState: MaterialsReducerType = {
+  materials: [],
   fetching: true,
   editing: false,
   deleting: false,
 };
-const customerSlice = createSlice({
-  name: "customer",
+const materialSlice = createSlice({
+  name: "material",
   initialState,
   reducers: {
-    fetchCustomers: (store, { payload }: { payload: CustomerType[] }) => {
-      store.customers = [...payload];
+    fetchMaterials: (store, { payload }: { payload: MaterialType[] }) => {
+      store.materials = [...payload];
     },
-    editCustomer: (store, { payload }: { payload: CustomerType }) => {
-      const customerToUpdateIndex = store.customers.findIndex(
-        (customer) => customer.id === payload.id
+    editMaterial: (store, { payload }: { payload: MaterialType }) => {
+      const materialToUpdateIndex = store.materials.findIndex(
+        (material) => material.id === payload.id
       );
-      if (customerToUpdateIndex >= 0) {
-        store.customers[customerToUpdateIndex] = { ...payload };
+      if (materialToUpdateIndex >= 0) {
+        store.materials[materialToUpdateIndex] = { ...payload };
       }
-      console.log("CUSTOMER INDEX", customerToUpdateIndex);
+      console.log("MATERIAL INDEX", materialToUpdateIndex);
     },
-    deleteCustomer: (store, { payload: id }: { payload: string }) => {
-      store.customers = store.customers.filter(
-        (customer) => customer.id !== id
+    deleteMaterial: (store, { payload: id }: { payload: string }) => {
+      store.materials = store.materials.filter(
+        (material) => material.id !== id
       );
     },
     toogleLoadingState: (
@@ -47,12 +47,12 @@ const customerSlice = createSlice({
   },
 });
 
-export const fetchCustomersAction = () => {
-  const fetchCustomers = async (dispatch: Dispatch<AnyAction>) => {
-    return new Promise<{ data: CustomerType[] }>((resolve, reject) => {
+export const fetchMaterialsAction = () => {
+  const fetchMaterials = async (dispatch: Dispatch<AnyAction>) => {
+    return new Promise<{ data: MaterialType[] }>((resolve, reject) => {
       // SET FETCHING STATE TO TRUE
       dispatch(
-        customerActions.toogleLoadingState({
+        materialActions.toogleLoadingState({
           state: true,
           property: "fetching",
         })
@@ -62,36 +62,36 @@ export const fetchCustomersAction = () => {
         if (data) {
           // SET FETCHING STATE TO FALSE
           dispatch(
-            customerActions.toogleLoadingState({
+            materialActions.toogleLoadingState({
               state: false,
               property: "fetching",
             })
           );
-          resolve({ data: data.customers });
+          resolve({ data: data.materials });
         }
       }, 3000);
     });
   };
 
   return async (dispatch: Dispatch<AnyAction>) => {
-    const response = await fetchCustomers(dispatch).catch((e) => undefined);
+    const response = await fetchMaterials(dispatch).catch((e) => undefined);
     if (response) {
-      dispatch(customerActions.fetchCustomers(response.data));
+      dispatch(materialActions.fetchMaterials(response.data));
     }
   };
 };
 
-export const editCustomerAction = (
-  customer: CustomerType,
+export const editMaterialAction = (
+  material: MaterialType,
   onFinishEditing?: Function
 ) => {
   console.log("ACTION CALLED");
 
-  const editCustomer = async (dispatch: Dispatch<AnyAction>) => {
+  const editMaterial = async (dispatch: Dispatch<AnyAction>) => {
     return new Promise<boolean>((resolve, reject) => {
       // SET EDITING STATE TO TRUE
       dispatch(
-        customerActions.toogleLoadingState({
+        materialActions.toogleLoadingState({
           state: true,
           property: "editing",
         })
@@ -99,7 +99,7 @@ export const editCustomerAction = (
       setTimeout(() => {
         // SET EDITING STATE TO FALSE
         dispatch(
-          customerActions.toogleLoadingState({
+          materialActions.toogleLoadingState({
             state: false,
             property: "editing",
           })
@@ -110,24 +110,24 @@ export const editCustomerAction = (
   };
 
   return async (dispatch: Dispatch<AnyAction>) => {
-    const status = await editCustomer(dispatch);
+    const status = await editMaterial(dispatch);
     if (status) {
-      dispatch(customerActions.editCustomer(customer));
+      dispatch(materialActions.editMaterial(material));
       onFinishEditing ? onFinishEditing() : null;
     }
   };
 };
 
-export const deleteCustomerAction = (
+export const deleteMaterialAction = (
   id: string,
   onFinishDeleting?: Function
 ) => {
   console.log("ACTION CALLED");
 
-  const deleteCustomer = async (dispatch: Dispatch<AnyAction>) => {
+  const deleteMaterial = async (dispatch: Dispatch<AnyAction>) => {
     // SET DELETING STATE TO TRUE
     dispatch(
-      customerActions.toogleLoadingState({
+      materialActions.toogleLoadingState({
         state: true,
         property: "deleting",
       })
@@ -136,7 +136,7 @@ export const deleteCustomerAction = (
       setTimeout(() => {
         // SET DELETING STATE TO FALSE
         dispatch(
-          customerActions.toogleLoadingState({
+          materialActions.toogleLoadingState({
             state: false,
             property: "deleting",
           })
@@ -147,12 +147,12 @@ export const deleteCustomerAction = (
   };
 
   return async (dispatch: Dispatch<AnyAction>) => {
-    const status = await deleteCustomer(dispatch);
+    const status = await deleteMaterial(dispatch);
     if (status) {
-      dispatch(customerActions.deleteCustomer(id));
+      dispatch(materialActions.deleteMaterial(id));
       onFinishDeleting && onFinishDeleting();
     }
   };
 };
 
-export default customerSlice;
+export default materialSlice;
