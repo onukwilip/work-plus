@@ -1,4 +1,5 @@
 import { ChangeEvent, FC, HTMLInputTypeAttribute } from "react";
+import { DropdownItemProps } from "semantic-ui-react";
 
 export type InputType = {
   className?: string;
@@ -127,3 +128,43 @@ export type VATReducerType = {
 };
 
 export type ModalPayload<T> = { component: FC<T>; properties: T };
+export type JobDetailsType = {
+  customerId: string | undefined;
+  customerName: string | undefined;
+  customerAddress: string | undefined;
+  customerPhone: string | undefined;
+  customerEmail: string | undefined;
+  jobNumber: string | undefined;
+  dateReceived: Date | undefined;
+  dateTobeCompleted: Date | undefined;
+  instructionTakenBy: string | undefined;
+  jobDoneBy: string | undefined;
+  timeStarted: string | undefined;
+  timeCompleted: string | undefined;
+};
+export type JobDetailsKeysType =
+  | "customerId"
+  | "customerName"
+  | "customerAddress"
+  | "customerPhone"
+  | "customerEmail"
+  | "jobNumber"
+  | "dateReceived"
+  | "dateTobeCompleted"
+  | "instructionTakenBy"
+  | "jobDoneBy"
+  | "timeStarted"
+  | "timeCompleted";
+
+export type JobDetailsPropsType = {
+  customerOptions: DropdownItemProps[];
+  customers: CustomerReducerType;
+  changeJobDetails: React.Dispatch<React.SetStateAction<JobDetailsType>>;
+  jobDetails: JobDetailsType;
+  changeSection: React.Dispatch<React.SetStateAction<CreateOrderSectionNames>>;
+};
+
+export type CreateOrderSectionNames =
+  | "jobDetails"
+  | "materials"
+  | "labourCosts";
