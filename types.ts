@@ -1,16 +1,28 @@
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC, HTMLInputTypeAttribute } from "react";
 
 export type InputType = {
   className?: string;
   label?: string;
-  icon: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  value: string | undefined;
-  onBlur: () => void;
-  name: string;
-  type: string;
-  placeholder: string;
-  id: string;
+  icon?: string;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  value?: string | undefined;
+  onBlur?: () => void;
+  name?: string;
+  type:
+    | "text"
+    | "email"
+    | "password"
+    | "url"
+    | "number"
+    | "date"
+    | "time"
+    | "search"
+    | "week"
+    | "month"
+    | "datetime-local"
+    | "tel";
+  placeholder?: string;
+  id?: string;
   hideLabel?: boolean;
   error?:
     | {

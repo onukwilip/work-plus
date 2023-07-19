@@ -16,6 +16,7 @@ const Input: React.FC<InputType> = ({
   label,
   error,
   hideLabel,
+  ...props
 }) => {
   const inputHolder = useRef<HTMLDivElement>(null);
   const inputElem = useRef<HTMLInputElement>(null);
@@ -39,7 +40,7 @@ const Input: React.FC<InputType> = ({
 
   const onInputElementChange = (e: ChangeEvent<HTMLInputElement>) => {
     onInputClick();
-    onChange(e);
+    typeof onChange === "function" && onChange(e);
   };
 
   const onDocumentClick = (e: Event) => {
@@ -82,6 +83,7 @@ const Input: React.FC<InputType> = ({
           ref={inputElem}
           id={id}
           value={value}
+          {...props}
         />
         {type === "password" ? (
           <i
@@ -98,9 +100,7 @@ const Input: React.FC<InputType> = ({
               ref={errorElem}
             ></i>
             {typeof error === "object" && (
-              <span
-                style={{ ...(error.position || { bottom: "-3rem", left: 0 }) }}
-              >
+              <span style={{ ...(error.position || { right: 0 }) }}>
                 {error?.content}
               </span>
             )}
