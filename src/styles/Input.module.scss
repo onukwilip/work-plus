@@ -25,8 +25,11 @@ div.input {
       outline: none !important;
       flex: 1;
       &:-webkit-autofill,
-      &:-moz-autofill {
-        background: transparent !important;
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill:hover {
+        -webkit-text-fill-color: nth($pry-colors, 1);
+        -webkit-box-shadow: 0 0 0px 1000px rgba(black, 0) inset;
+        transition: background-color 5000s ease-in-out 0s;
       }
 
       &::placeholder {

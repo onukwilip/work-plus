@@ -16,6 +16,7 @@ const Input: React.FC<InputType> = ({
   label,
   error,
   hideLabel,
+  required,
   ...props
 }) => {
   const inputHolder = useRef<HTMLDivElement>(null);
@@ -65,7 +66,11 @@ const Input: React.FC<InputType> = ({
 
   return (
     <div className={css.input}>
-      {!hideLabel && <label htmlFor={id}>{label || name}</label>}
+      {!hideLabel && (
+        <label htmlFor={id}>
+          {label || name} {required && "*"}
+        </label>
+      )}
       <div
         className={`${css["input-holder"]} ${error ? css.error : ""} ${
           className || ""

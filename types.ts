@@ -25,6 +25,7 @@ export type InputType = {
   placeholder?: string;
   id?: string;
   hideLabel?: boolean;
+  required?: boolean;
   error?:
     | {
         content: string;
@@ -134,6 +135,7 @@ export type JobDetailsType = {
   customerAddress: string | undefined;
   customerPhone: string | undefined;
   customerEmail: string | undefined;
+  customerImage?: string;
   jobNumber: string | undefined;
   dateReceived: Date | undefined;
   dateTobeCompleted: Date | undefined;

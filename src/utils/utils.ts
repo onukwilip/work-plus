@@ -87,6 +87,27 @@ export const validateProperties = ({
   return true;
 };
 
+export const validateObjectValues = ({
+  keys,
+  object,
+  strict,
+}: {
+  keys: string[];
+  object: Record<any, any>;
+  strict?: boolean;
+}) => {
+  let valueIsUndefined = 0;
+  for (const key of keys) {
+    if (!object[key]) {
+      valueIsUndefined++;
+      if (strict) return false;
+    }
+  }
+
+  if (valueIsUndefined === keys?.length) return false;
+  return true;
+};
+
 export const compareTwoArrays = <arr1T, arr2T>(
   arr1: (arr1T | any)[],
   arr2: (arr2T | any)[],

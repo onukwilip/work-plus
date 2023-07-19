@@ -13,10 +13,9 @@ export class ErrorTable<T> {
   constructor(public date: Date, public message: string, public item?: T) {}
 }
 
-export class CreateOrderSectionsClass<T> {
+export class CreateOrderSectionsClass {
   constructor(
     public name: CreateOrderSectionNames,
-    public Component: React.FC | React.FC<any>,
-    public props: T
+    public Component: React.JSX.Element
   ) {}
 }

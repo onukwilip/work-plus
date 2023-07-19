@@ -25,6 +25,7 @@ import { fetchCustomersAction } from "@/store/customersReducer";
 import { AnyAction } from "redux";
 import { useForm, useInput } from "use-manage-form";
 import { CreateOrderSectionsClass } from "@/utils/classes";
+import { validateObjectValues } from "@/utils/utils";
 
 const CreateOrder = () => {
   const customers: CustomerReducerType = useSelector<SelectorType>(
@@ -42,6 +43,7 @@ const CreateOrder = () => {
     customerAddress: undefined,
     customerPhone: undefined,
     customerEmail: undefined,
+    customerImage: undefined,
     jobNumber: undefined,
     dateReceived: undefined,
     dateTobeCompleted: undefined,
@@ -50,21 +52,32 @@ const CreateOrder = () => {
     timeStarted: undefined,
     timeCompleted: undefined,
   });
-  const sections = useMemo<CreateOrderSectionsClass<any>[]>(
+  const sections = useMemo<CreateOrderSectionsClass[]>(
     () => [
-      new CreateOrderSectionsClass<JobDetailsPropsType>(
+      new CreateOrderSectionsClass(
         "jobDetails",
-        JobDetailsSection,
-        {
-          customerOptions: customerOptions,
-          customers: customers,
-          jobDetails: jobDetails,
-          changeJobDetails: setJobDetails,
-          changeSection: setCurrentSectionName,
-        }
+        (
+          <>
+            <JobDetailsSection
+              customerOptions={customerOptions}
+              jobDetails={jobDetails}
+              customers={customers}
+              changeJobDetails={setJobDetails}
+              changeSection={setCurrentSectionName}
+            />
+          </>
+        )
+      ),
+      new CreateOrderSectionsClass(
+        "materials",
+        (
+          <>
+            <MaterialsSection />
+          </>
+        )
       ),
     ],
-    []
+    [customerOptions, currentSectionName]
   );
   const getCurrentSection = () => {
     const section = sections.find(
@@ -79,6 +92,7 @@ const CreateOrder = () => {
 
   useEffect(() => {
     dispatch(fetchCustomersAction() as unknown as AnyAction);
+    console.log("CALLED");
   }, []);
   useEffect(() => {
     setCustomerOptions(
@@ -89,24 +103,30 @@ const CreateOrder = () => {
       }))
     );
   }, [customers]);
-  //   useEffect(() => {
-  //     console.log("DETAILS", jobDetails);
-  //   }, [jobDetails]);
+  useEffect(() => {
+    console.log("DETAILS", jobDetails);
+  }, [jobDetails, currentSectionName]);
 
   return (
     <section className={css["create-order"]}>
       <h3>Create invoice</h3>
       <ul className={css["bread-crumbs"]}>
         {sections.map((section, i) => (
-          <li
-            key={i}
-            className={currentSectionName === section.name ? css["active"] : ""}
-          >
-            {section.name} {i < sections.length - 1 && ">"}
-          </li>
+          <>
+            <li
+              key={i}
+              className={
+                currentSectionName === section.name ? css["active"] : ""
+              }
+              onClick={() => setCurrentSectionName(section.name)}
+            >
+              {section.name}
+            </li>
+            {i < sections.length - 1 && <li> &gt; </li>}
+          </>
         ))}
       </ul>
-      <currentSection.Component {...currentSection.props} />
+      {currentSection.Component}
     </section>
   );
 };
@@ -116,6 +136,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
   customers,
   changeJobDetails,
   jobDetails,
+  changeSection,
 }) => {
   const [customerDetails, setCustomerDetails] = useState<
     CustomerType | undefined
@@ -192,7 +213,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
     (value) => value?.trim() !== "" && (value ? true : false)
   );
 
-  const {} = useForm({
+  const { formIsValid, executeBlurHandlers } = useForm({
     blurHandlers: [
       onJobNumberBlur,
       onDateReceivedBlur,
@@ -218,7 +239,13 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
       instructionTakenByIsValid &&
       jobDoneByIsValid &&
       timeStartedIsValid &&
-      timeCompletedIsValid,
+      timeCompletedIsValid &&
+      (customerDetails || false) &&
+      validateObjectValues({
+        keys: ["id", "name", "address", "email", "phone"],
+        object: customerDetails,
+        strict: true,
+      }),
   });
 
   const onCustomerChange = (
@@ -236,6 +263,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
       customerEmail: details?.email,
       customerName: details?.name,
       customerPhone: details?.phone,
+      customerImage: details?.image,
     }));
   };
 
@@ -251,6 +279,12 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
     }));
   };
 
+  const submitHandler = () => {
+    if (!formIsValid) return executeBlurHandlers();
+
+    changeSection("materials");
+  };
+
   // PRESERVE THE DATA OF ALL THE INPUTS
   useEffect(() => {
     setCustomerDetails({
@@ -259,6 +293,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
       address: jobDetails.customerAddress || "",
       email: jobDetails.customerEmail || "",
       phone: jobDetails.customerPhone || "",
+      image: jobDetails.customerImage,
     });
     onJobNumberChange(jobDetails.jobNumber);
     onDateReceivedChange(jobDetails.dateReceived);
@@ -272,10 +307,10 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
   return (
     <>
       <h3>Job details</h3>
-      <Form className={css["job-details-form"]}>
+      <Form className={css["job-details-form"]} onSubmit={submitHandler}>
         <div>
           <div className={css["select-customer-container"]}>
-            <label>Customer</label>
+            <label>Customer *</label>
             <Form.Select
               placeholder="Select customer..."
               labeled
@@ -342,6 +377,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
           <Input
             type="date"
@@ -359,6 +395,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
           <Input
             type="date"
@@ -380,6 +417,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
           <Input
             type="text"
@@ -401,6 +439,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
           <Input
             type="text"
@@ -418,6 +457,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
           <Input
             type="time"
@@ -435,6 +475,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
           <Input
             type="time"
@@ -452,10 +493,11 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                 content: "Input must not be empty",
               }
             }
+            required
           />
         </div>
         <div>
-          <Button animated primary>
+          <Button animated primary type="submit" disabled={!formIsValid}>
             <Button.Content visible>Next</Button.Content>
             <Button.Content hidden>
               <Icon name="arrow right" />
@@ -463,6 +505,15 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
           </Button>
         </div>
       </Form>
+    </>
+  );
+};
+
+const MaterialsSection: FC = () => {
+  return (
+    <>
+      <h3>Materials</h3>
+      <Form className={css["materials-form"]}></Form>
     </>
   );
 };

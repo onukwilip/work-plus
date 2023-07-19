@@ -10,7 +10,10 @@ section.create-order {
     & > .bread-crumbs {
         list-style-type: none;
         padding: 0;
+        @include flex(center, start, 1rem, row);
         li {
+            text-transform: uppercase;
+            cursor: pointer;
             &.active {
                 color: nth($pry-colors, 3);
             }
