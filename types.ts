@@ -80,6 +80,12 @@ export type MaterialType = {
   ["unit price"]: string | number;
 };
 
+export type LabourCostType = {
+  id: string;
+  description: string;
+  ["unit price"]: string | number;
+};
+
 export type VATType = {
   id: string;
   description: string;
@@ -163,6 +169,22 @@ export type JobDetailsPropsType = {
   customers: CustomerReducerType;
   changeJobDetails: React.Dispatch<React.SetStateAction<JobDetailsType>>;
   jobDetails: JobDetailsType;
+  changeSection: React.Dispatch<React.SetStateAction<CreateOrderSectionNames>>;
+};
+
+export type MaterialsSectionPropstype = {
+  materialOptions: DropdownItemProps[];
+  materials: MaterialsReducerType;
+  selectedMaterials: MaterialType[];
+  changeSelectedMaterials: React.Dispatch<React.SetStateAction<MaterialType[]>>;
+  changeSection: React.Dispatch<React.SetStateAction<CreateOrderSectionNames>>;
+};
+
+export type LabourCostsSectionPropstype = {
+  addedLabourCosts: LabourCostType[];
+  changeAddedLabourCosts: React.Dispatch<
+    React.SetStateAction<LabourCostType[]>
+  >;
   changeSection: React.Dispatch<React.SetStateAction<CreateOrderSectionNames>>;
 };
 

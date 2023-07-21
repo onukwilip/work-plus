@@ -11,6 +11,7 @@ import { fetchMaterialsAction } from "@/store/materialsReducer";
 import { AnyAction } from "redux";
 import CustomLoader from "./CustomLoader";
 import DeleteMaterial from "./DeleteMaterial";
+import { formatToCurrency } from "@/utils/utils";
 
 const MaterialDetails: React.FC<{
   material: MaterialType;
@@ -74,7 +75,7 @@ const MaterialDetails: React.FC<{
           transition={{ delay: 1 / 30 }}
         >
           <i className="fas fa-dollar-sign"></i>{" "}
-          <span>{material["unit price"]}</span>
+          <span>{formatToCurrency(material["unit price"])}</span>
         </motion.li>
       </ul>
       <div className={css.actions}>

@@ -142,3 +142,14 @@ export const convertArrToObj = <T extends Record<any, any>>(
 
   return result;
 };
+
+export const formatToCurrency = (number: string | number) => {
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "NGN",
+  });
+  const convertedNumber = Number(number);
+  if (isNaN(convertedNumber)) return number;
+
+  return formatter.format(convertedNumber);
+};

@@ -1,14 +1,16 @@
 "use client";
-import React, { FC, useEffect, useState, useMemo } from "react";
+import React, { FC, useEffect, useState, useMemo, FormEvent } from "react";
 import css from "@/styles/CreateOrder.module.scss";
 import {
   Button,
+  Checkbox,
   DropdownItemProps,
   DropdownProps,
   Form,
   Icon,
   Image,
   Message,
+  Table,
 } from "semantic-ui-react";
 import Input from "./Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,19 +21,32 @@ import {
   JobDetailsKeysType,
   JobDetailsPropsType,
   JobDetailsType,
+  LabourCostType,
+  LabourCostsSectionPropstype,
+  MaterialType,
+  MaterialsReducerType,
+  MaterialsSectionPropstype,
   SelectorType,
 } from "../../types";
 import { fetchCustomersAction } from "@/store/customersReducer";
 import { AnyAction } from "redux";
 import { useForm, useInput } from "use-manage-form";
 import { CreateOrderSectionsClass } from "@/utils/classes";
-import { validateObjectValues } from "@/utils/utils";
+import { formatToCurrency, validateObjectValues } from "@/utils/utils";
+import { fetchMaterialsAction } from "@/store/materialsReducer";
+import { v4 as uuidV4 } from "uuid";
 
 const CreateOrder = () => {
   const customers: CustomerReducerType = useSelector<SelectorType>(
     (state) => state.customers
   ) as CustomerReducerType;
   const [customerOptions, setCustomerOptions] = useState<DropdownItemProps[]>(
+    []
+  );
+  const materials: MaterialsReducerType = useSelector<SelectorType>(
+    (state) => state.materials
+  ) as MaterialsReducerType;
+  const [materialOptions, setMaterialOptions] = useState<DropdownItemProps[]>(
     []
   );
   const [currentSectionName, setCurrentSectionName] =
@@ -52,6 +67,13 @@ const CreateOrder = () => {
     timeStarted: undefined,
     timeCompleted: undefined,
   });
+  const [selectedmaterials, setSelectedMaterials] = useState<MaterialType[]>(
+    []
+  );
+  const [addedLabourCosts, setAddedLabourCosts] = useState<LabourCostType[]>(
+    []
+  );
+
   const sections = useMemo<CreateOrderSectionsClass[]>(
     () => [
       new CreateOrderSectionsClass(
@@ -72,12 +94,36 @@ const CreateOrder = () => {
         "materials",
         (
           <>
-            <MaterialsSection />
+            <MaterialsSection
+              materialOptions={materialOptions}
+              changeSection={setCurrentSectionName}
+              selectedMaterials={selectedmaterials}
+              changeSelectedMaterials={setSelectedMaterials}
+              materials={materials}
+            />
+          </>
+        )
+      ),
+      new CreateOrderSectionsClass(
+        "labourCosts",
+        (
+          <>
+            <LabourCostsSection
+              addedLabourCosts={addedLabourCosts}
+              changeAddedLabourCosts={setAddedLabourCosts}
+              changeSection={setCurrentSectionName}
+            />
           </>
         )
       ),
     ],
-    [customerOptions, currentSectionName]
+    [
+      customerOptions,
+      currentSectionName,
+      materialOptions,
+      selectedmaterials,
+      addedLabourCosts,
+    ]
   );
   const getCurrentSection = () => {
     const section = sections.find(
@@ -92,6 +138,7 @@ const CreateOrder = () => {
 
   useEffect(() => {
     dispatch(fetchCustomersAction() as unknown as AnyAction);
+    dispatch(fetchMaterialsAction() as unknown as AnyAction);
     console.log("CALLED");
   }, []);
   useEffect(() => {
@@ -103,6 +150,15 @@ const CreateOrder = () => {
       }))
     );
   }, [customers]);
+  useEffect(() => {
+    setMaterialOptions(
+      materials.materials.map((material) => ({
+        key: material.id,
+        value: material.id,
+        text: material.description,
+      }))
+    );
+  }, [materials]);
   useEffect(() => {
     console.log("DETAILS", jobDetails);
   }, [jobDetails, currentSectionName]);
@@ -118,7 +174,7 @@ const CreateOrder = () => {
               className={
                 currentSectionName === section.name ? css["active"] : ""
               }
-              onClick={() => setCurrentSectionName(section.name)}
+              // onClick={() => setCurrentSectionName(section.name)}
             >
               {section.name}
             </li>
@@ -317,7 +373,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
               options={customerOptions}
               loading={customers.fetching}
               onChange={onCustomerChange}
-              defaultValue={jobDetails.customerName}
+              defaultValue={customerDetails?.name}
             />
           </div>
           <div className={css["customer-details"]}>
@@ -332,7 +388,7 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
                   .filter((eachKey) => eachKey !== "id")
                   .map((eachKey) => (
                     <>
-                      <li>
+                      <li key={eachKey}>
                         {eachKey !== "image" ? (
                           <>
                             <span>{eachKey}:&nbsp;</span>
@@ -509,11 +565,396 @@ const JobDetailsSection: FC<JobDetailsPropsType> = ({
   );
 };
 
-const MaterialsSection: FC = () => {
+const EaahSelectedMaterial: FC<{
+  material: MaterialType;
+  changeSelectedMaterials: React.Dispatch<React.SetStateAction<MaterialType[]>>;
+}> = ({ material, changeSelectedMaterials }) => {
+  const removeMaterial = () => {
+    changeSelectedMaterials((prevMaterials) =>
+      prevMaterials.filter(
+        (selectedmaterial) => selectedmaterial.id !== material.id
+      )
+    );
+  };
+
+  return (
+    <Table.Row>
+      <Table.Cell>{material.description}</Table.Cell>
+      <Table.Cell>{formatToCurrency(material["unit price"])}</Table.Cell>
+      <Table.Cell collapsing>
+        <Button size="small" negative onClick={removeMaterial}>
+          Remove
+        </Button>
+      </Table.Cell>
+    </Table.Row>
+  );
+};
+
+const MaterialsSection: FC<MaterialsSectionPropstype> = ({
+  materialOptions,
+  materials,
+  selectedMaterials,
+  changeSection,
+  changeSelectedMaterials,
+}) => {
+  const [materialDetails, setMaterialDetails] = useState<
+    MaterialType | undefined
+  >();
+
+  const onMaterialChange = (
+    e: React.SyntheticEvent<HTMLElement, Event>,
+    data: DropdownProps
+  ) => {
+    const details = materials.materials.find(
+      (material) => material.id === data.value
+    );
+    console.log("selected material", details);
+    setMaterialDetails(details);
+  };
+  const addMaterial = () => {
+    if (materialDetails)
+      changeSelectedMaterials((prevMaterials) => [
+        ...prevMaterials,
+        materialDetails,
+      ]);
+    setMaterialDetails(undefined);
+  };
+  const sumTotal = (): string | number => {
+    const mappedArr = selectedMaterials.map(
+      (material) => material["unit price"]
+    );
+    if (mappedArr.length > 0)
+      return formatToCurrency(
+        mappedArr.reduce((prev, curr) => Number(prev) + Number(curr))
+      );
+    else return formatToCurrency(0);
+  };
+  const onPreviousClick = () => {
+    changeSection("jobDetails");
+  };
+  const onNextClick = () => {
+    changeSection("labourCosts");
+  };
+
   return (
     <>
       <h3>Materials</h3>
-      <Form className={css["materials-form"]}></Form>
+      <Form className={css["materials-form"]}>
+        <div>
+          <div className={css["select-material-container"]}>
+            <label>Material</label>
+            <Form.Select
+              placeholder="Select material..."
+              labeled
+              options={materialOptions}
+              loading={materials.fetching}
+              onChange={onMaterialChange}
+              defaultValue={materialDetails?.description}
+            />
+          </div>
+          <div className={css["material-details"]}>
+            {materialDetails?.description &&
+            materialDetails?.id &&
+            materialDetails?.["unit price"] ? (
+              <ul>
+                {Object.keys(materialDetails)
+                  .reverse()
+                  .filter((eachKey) => eachKey !== "id")
+                  .map((eachKey) => (
+                    <>
+                      <li key={eachKey}>
+                        <span>{eachKey}:&nbsp;</span>
+                        <span>
+                          {eachKey === "unit price"
+                            ? formatToCurrency(
+                                (materialDetails as any)[eachKey]
+                              )
+                            : (materialDetails as any)[eachKey]}
+                        </span>
+                      </li>
+                    </>
+                  ))}
+              </ul>
+            ) : (
+              <Message
+                header="No material selected"
+                color="yellow"
+                content="Please select a material"
+                className={css["message"]}
+              />
+            )}
+          </div>
+          <div className={css["actions"]}>
+            <Button icon labelPosition="left" primary onClick={addMaterial}>
+              <Icon name="plus" />
+              Add material
+            </Button>
+          </div>
+        </div>
+        <div>
+          <h4>Selected materials</h4>
+          <Table celled selectable={selectedMaterials.length > 0}>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Description</Table.HeaderCell>
+                <Table.HeaderCell>Unit price</Table.HeaderCell>
+                <Table.HeaderCell collapsing>Actions</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
+              {selectedMaterials.length < 1 ? (
+                <Table.Row>
+                  <Table.Cell colSpan={3}>
+                    <Message content="No materials added" />
+                  </Table.Cell>
+                </Table.Row>
+              ) : (
+                selectedMaterials.map((material) => (
+                  <EaahSelectedMaterial
+                    changeSelectedMaterials={changeSelectedMaterials}
+                    material={material}
+                    key={material.id}
+                  />
+                ))
+              )}
+            </Table.Body>
+
+            <Table.Footer fullWidth>
+              <Table.Row>
+                <Table.HeaderCell colSpan="3" textAlign="right">
+                  <b>TOTAL: </b>{" "}
+                  <span style={{ fontSize: 20 }}>{sumTotal()}</span>
+                </Table.HeaderCell>
+              </Table.Row>
+            </Table.Footer>
+          </Table>
+        </div>
+        <div className={css["actions"]}>
+          <Button animated primary type="submit" onClick={onPreviousClick}>
+            <Button.Content visible>Previous</Button.Content>
+            <Button.Content hidden>
+              <Icon name="arrow left" />
+            </Button.Content>
+          </Button>
+          <Button animated primary type="submit" onClick={onNextClick}>
+            <Button.Content visible>Next</Button.Content>
+            <Button.Content hidden>
+              <Icon name="arrow right" />
+            </Button.Content>
+          </Button>
+        </div>
+      </Form>
+    </>
+  );
+};
+
+const EaahSelectedLabourCost: FC<{
+  labourCost: LabourCostType;
+  changeSelectedLabourCosts: React.Dispatch<
+    React.SetStateAction<LabourCostType[]>
+  >;
+}> = ({ labourCost, changeSelectedLabourCosts }) => {
+  const removeLabourCost = () => {
+    changeSelectedLabourCosts((prevLabourCosts) =>
+      prevLabourCosts.filter(
+        (selectedlabourCost) => selectedlabourCost.id !== labourCost.id
+      )
+    );
+  };
+
+  return (
+    <Table.Row>
+      <Table.Cell>{labourCost.description}</Table.Cell>
+      <Table.Cell>{formatToCurrency(labourCost["unit price"])}</Table.Cell>
+      <Table.Cell collapsing>
+        <Button size="small" negative onClick={removeLabourCost}>
+          Remove
+        </Button>
+      </Table.Cell>
+    </Table.Row>
+  );
+};
+
+const LabourCostsSection: FC<LabourCostsSectionPropstype> = ({
+  addedLabourCosts,
+  changeAddedLabourCosts,
+  changeSection,
+}) => {
+  const {
+    value: description,
+    isValid: descriptionIsValid,
+    inputIsInValid: descriptionIsInValid,
+    onChange: onDescriptionChange,
+    onBlur: onDescriptionBlur,
+    reset: resetDescription,
+  } = useInput<string>(
+    (value) => value?.trim() !== "" && (value ? true : false)
+  );
+  const {
+    value: unitPrice,
+    isValid: unitPriceIsValid,
+    inputIsInValid: unitPriceIsInValid,
+    onChange: onUnitPriceChange,
+    onBlur: onUnitPriceBlur,
+    reset: resetUnitPrice,
+  } = useInput<string>((value) => !isNaN(Number(value)) && Number(value) > 0);
+
+  const { executeBlurHandlers, reset, formIsValid } = useForm({
+    blurHandlers: [onDescriptionBlur, onUnitPriceBlur],
+    resetHandlers: [resetUnitPrice, resetDescription],
+    validateOptions: () => descriptionIsValid && unitPriceIsValid,
+  });
+
+  const addLabourCost = () => {
+    const labourCostDetails = {
+      description: description,
+      ["unit price"]: unitPrice || 0,
+      id: uuidV4(),
+    };
+    if (
+      validateObjectValues({
+        keys: ["description", "unit price", "id"],
+        object: labourCostDetails,
+        strict: true,
+      }) &&
+      formIsValid
+    ) {
+      changeAddedLabourCosts((prevLabourCosts) => [
+        ...prevLabourCosts,
+        labourCostDetails as MaterialType,
+      ]);
+      reset();
+    } else {
+      executeBlurHandlers();
+    }
+  };
+  const sumTotal = (): string | number => {
+    const mappedArr = addedLabourCosts.map(
+      (labourCost) => labourCost["unit price"]
+    );
+    if (mappedArr.length > 0)
+      return formatToCurrency(
+        mappedArr.reduce((prev, curr) => Number(prev) + Number(curr))
+      );
+    else return formatToCurrency(0);
+  };
+  const onPreviousClick = () => {
+    changeSection("materials");
+  };
+  const onNextClick = () => {
+    changeSection("labourCosts");
+  };
+
+  return (
+    <>
+      <h3>LabourCosts</h3>
+      <Form className={css["labourCosts-form"]}>
+        <div className={css["add-labourCost-container"]}>
+          <label>Labour cost</label>
+          <div className={css["input-container"]}>
+            <div>
+              <Input
+                icon="fas fa-circle-info"
+                onChange={(e) => onDescriptionChange(e?.target?.value)}
+                onBlur={onDescriptionBlur as any}
+                value={description}
+                name="description"
+                type="text"
+                placeholder="Enter description"
+                id="description"
+                error={
+                  descriptionIsInValid && { content: "Input cannot be empty" }
+                }
+              />
+            </div>
+            <div>
+              <Input
+                icon="fas fa-dollar-sign"
+                onChange={(e) => onUnitPriceChange(e?.target?.value)}
+                onBlur={onUnitPriceBlur as any}
+                value={unitPrice}
+                name="unitPrice"
+                label="unit price"
+                type="number"
+                placeholder="Enter unit price"
+                id="unitPrice"
+                error={
+                  unitPriceIsInValid && {
+                    content:
+                      "Input cannot be empty and must be a number greater than 0",
+                  }
+                }
+              />
+            </div>
+          </div>
+          <div className={css["actions"]}>
+            <Button
+              icon
+              labelPosition="left"
+              primary
+              onClick={addLabourCost}
+              disabled={!formIsValid}
+            >
+              <Icon name="plus" />
+              Add labour cost
+            </Button>
+          </div>
+        </div>
+        <div>
+          <h4>Selected labourCosts</h4>
+          <Table celled selectable={addedLabourCosts.length > 0}>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Description</Table.HeaderCell>
+                <Table.HeaderCell>Unit price</Table.HeaderCell>
+                <Table.HeaderCell collapsing>Actions</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
+              {addedLabourCosts.length < 1 ? (
+                <Table.Row>
+                  <Table.Cell colSpan={3}>
+                    <Message content="No labourCosts added" />
+                  </Table.Cell>
+                </Table.Row>
+              ) : (
+                addedLabourCosts.map((labourCost) => (
+                  <EaahSelectedLabourCost
+                    changeSelectedLabourCosts={changeAddedLabourCosts}
+                    labourCost={labourCost}
+                    key={labourCost.id}
+                  />
+                ))
+              )}
+            </Table.Body>
+
+            <Table.Footer fullWidth>
+              <Table.Row>
+                <Table.HeaderCell colSpan="3" textAlign="right">
+                  <b>TOTAL: </b>{" "}
+                  <span style={{ fontSize: 20 }}>{sumTotal()}</span>
+                </Table.HeaderCell>
+              </Table.Row>
+            </Table.Footer>
+          </Table>
+        </div>
+        <div className={css["actions"]}>
+          <Button animated primary type="submit" onClick={onPreviousClick}>
+            <Button.Content visible>Previous</Button.Content>
+            <Button.Content hidden>
+              <Icon name="arrow left" />
+            </Button.Content>
+          </Button>
+          <Button animated positive type="submit" onClick={onNextClick}>
+            <Button.Content visible>Generate invoice</Button.Content>
+            <Button.Content hidden>
+              <Icon name="print" />
+            </Button.Content>
+          </Button>
+        </div>
+      </Form>
     </>
   );
 };
