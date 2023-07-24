@@ -153,3 +153,19 @@ export const formatToCurrency = (number: string | number) => {
 
   return formatter.format(convertedNumber);
 };
+
+export const sumTotal = (arr: (string | number)[]): string | number => {
+  if (arr.length > 0)
+    return arr.reduce((prev, curr) => Number(prev) + Number(curr));
+  else return 0;
+};
+
+export const sumAndFormatTotal = (
+  arr: (string | number)[]
+): string | number => {
+  if (arr.length > 0)
+    return formatToCurrency(
+      arr.reduce((prev, curr) => Number(prev) + Number(curr))
+    );
+  else return formatToCurrency(0);
+};

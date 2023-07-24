@@ -1,0 +1,123 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,700;0,800;1,100;1,200;1,300&display=swap");
+@import "./config.scss";
+
+.invoice-section {
+    * {
+        font-size: 16px;
+        color: rgba(black, 0.6);
+        font-family: Poppins !important;
+    }
+    min-width: 500px;
+    max-width: 1000px;
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: lighten(nth($pry-colors, 4), 5);
+    box-shadow: 0px 0px 20px rgba(nth($pry-colors, 2), 0.2);
+    @include flex(start, start, 1rem, column);
+    & > div,
+    & > hr {
+        width: 100%;
+    }
+    .head-section {
+        @include flex(center, space-between, 1rem, row);
+        .invoice-details {
+            list-style-type: none;
+            padding: 0;
+            li span {
+                &:first-of-type {
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    font-size: 18px;
+                }
+            }
+        }
+        .logo-container {
+            img {
+                transform: scale(1.1);
+            }
+        }
+    }
+    .address-section {
+        @include flex(start, space-between, 1rem, row);
+        .customer-details {
+            @include flex(start, start, 0, column);
+            & > span {
+                font-weight: bold;
+                font-size: 18px;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+        }
+        .company-container {
+            @include flex(end, start, 0, column);
+            & > span {
+                font-weight: bold;
+                font-size: 18px;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+                li {
+                    text-align: right;
+                }
+            }
+        }
+    }
+    .job-details {
+        @include flex(start, start, 0, column);
+        padding: 0;
+        list-style-type: none;
+        & > span {
+            text-transform: uppercase;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        li span {
+            &:first-of-type {
+                font-weight: bold;
+            }
+        }
+    }
+    .materials {
+        & > span {
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+    }
+    .labour-costs {
+        & > span {
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+    }
+    .span-title {
+        font-weight: bold;
+    }
+    @include media(max, 700px) {
+        min-width: 100%;
+    }
+    @include media(max, 390px) {
+        min-width: auto;
+        width: 99%;
+        .head-section {
+            flex-direction: column-reverse;
+        }
+        .address-section {
+            flex-direction: column;
+            .company-container {
+                align-items: start;
+                ul li {
+                    text-align: left;
+                }
+            }
+        }
+    }
+}

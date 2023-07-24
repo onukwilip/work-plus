@@ -1,4 +1,5 @@
 @import "./config.scss";
+
 section.create-order-tab {
     @include flex(start, start, 3rem, column);
     & > section {
@@ -7,15 +8,33 @@ section.create-order-tab {
 }
 
 section.create-order {
+    max-width: 100vw;
+    overflow-x: hidden;
     & > .bread-crumbs {
         list-style-type: none;
         padding: 0;
         @include flex(center, start, 1rem, row);
+        width: 98vw;
+        flex-wrap: wrap;
         li {
             text-transform: uppercase;
             cursor: pointer;
+            @include flex(center, center, 0.5rem, row);
+            span {
+                font-size: 12px !important;
+                width: 25px;
+                height: 25px;
+                @include flex(center, center, auto, row);
+                border-radius: 50%;
+                background: nth($pry-colors, 1);
+                color: nth($pry-colors, 4);
+            }
             &.active {
                 color: nth($pry-colors, 3);
+                span {
+                    background: nth($pry-colors, 4);
+                    color: nth($pry-colors, 1);
+                }
             }
         }
     }
@@ -174,6 +193,15 @@ section.create-order {
         & > .actions {
             width: 100%;
             @include flex(center, space-between, 1rem, row);
+        }
+    }
+    .generate-invoice {
+        padding: 0px 1rem;
+        @include flex(center, center, 2rem, column);
+        width: 100%;
+        .actions {
+            @include flex(start, space-between, 1rem, row);
+            width: 100%;
         }
     }
 }

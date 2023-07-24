@@ -1,5 +1,5 @@
 "use client";
-import React, { FC, useEffect, useState, useMemo, FormEvent } from "react";
+import React, { FC, useEffect, useState, useMemo, useRef } from "react";
 import css from "@/styles/CreateOrder.module.scss";
 import {
   Button,
@@ -18,6 +18,8 @@ import {
   CreateOrderSectionNames,
   CustomerReducerType,
   CustomerType,
+  GenerateInvoiceSectionPropsType,
+  InvoiceDetailsType,
   JobDetailsKeysType,
   JobDetailsPropsType,
   JobDetailsType,
@@ -27,6 +29,7 @@ import {
   MaterialsReducerType,
   MaterialsSectionPropstype,
   SelectorType,
+  VATReducerType,
 } from "../../types";
 import { fetchCustomersAction } from "@/store/customersReducer";
 import { AnyAction } from "redux";
@@ -35,6 +38,9 @@ import { CreateOrderSectionsClass } from "@/utils/classes";
 import { formatToCurrency, validateObjectValues } from "@/utils/utils";
 import { fetchMaterialsAction } from "@/store/materialsReducer";
 import { v4 as uuidV4 } from "uuid";
+import InvoiceSection from "./InvoiceSection";
+import { fetchVATAction } from "@/store/vatReducer";
+import ReactToPrint from "react-to-print";
 
 const CreateOrder = () => {
   const customers: CustomerReducerType = useSelector<SelectorType>(
@@ -46,6 +52,9 @@ const CreateOrder = () => {
   const materials: MaterialsReducerType = useSelector<SelectorType>(
     (state) => state.materials
   ) as MaterialsReducerType;
+  const vatReducer: VATReducerType = useSelector<SelectorType>(
+    (state) => state.vat
+  ) as VATReducerType;
   const [materialOptions, setMaterialOptions] = useState<DropdownItemProps[]>(
     []
   );
@@ -116,6 +125,20 @@ const CreateOrder = () => {
           </>
         )
       ),
+      new CreateOrderSectionsClass(
+        "generateInvoice",
+        (
+          <>
+            <GenerateInvoice
+              jobDetails={jobDetails}
+              selectedMaterials={selectedmaterials}
+              addedLabourCosts={addedLabourCosts}
+              vatReducer={vatReducer}
+              changeSection={setCurrentSectionName}
+            />
+          </>
+        )
+      ),
     ],
     [
       customerOptions,
@@ -123,6 +146,7 @@ const CreateOrder = () => {
       materialOptions,
       selectedmaterials,
       addedLabourCosts,
+      vatReducer,
     ]
   );
   const getCurrentSection = () => {
@@ -139,7 +163,7 @@ const CreateOrder = () => {
   useEffect(() => {
     dispatch(fetchCustomersAction() as unknown as AnyAction);
     dispatch(fetchMaterialsAction() as unknown as AnyAction);
-    console.log("CALLED");
+    dispatch(fetchVATAction() as unknown as AnyAction);
   }, []);
   useEffect(() => {
     setCustomerOptions(
@@ -159,9 +183,6 @@ const CreateOrder = () => {
       }))
     );
   }, [materials]);
-  useEffect(() => {
-    console.log("DETAILS", jobDetails);
-  }, [jobDetails, currentSectionName]);
 
   return (
     <section className={css["create-order"]}>
@@ -176,7 +197,7 @@ const CreateOrder = () => {
               }
               // onClick={() => setCurrentSectionName(section.name)}
             >
-              {section.name}
+              <span>{i + 1}</span> {section.name}
             </li>
             {i < sections.length - 1 && <li> &gt; </li>}
           </>
@@ -608,7 +629,6 @@ const MaterialsSection: FC<MaterialsSectionPropstype> = ({
     const details = materials.materials.find(
       (material) => material.id === data.value
     );
-    console.log("selected material", details);
     setMaterialDetails(details);
   };
   const addMaterial = () => {
@@ -685,7 +705,13 @@ const MaterialsSection: FC<MaterialsSectionPropstype> = ({
             )}
           </div>
           <div className={css["actions"]}>
-            <Button icon labelPosition="left" primary onClick={addMaterial}>
+            <Button
+              icon
+              labelPosition="left"
+              primary
+              onClick={addMaterial}
+              disabled={!materialDetails}
+            >
               <Icon name="plus" />
               Add material
             </Button>
@@ -843,7 +869,7 @@ const LabourCostsSection: FC<LabourCostsSectionPropstype> = ({
     changeSection("materials");
   };
   const onNextClick = () => {
-    changeSection("labourCosts");
+    changeSection("generateInvoice");
   };
 
   return (
@@ -956,6 +982,58 @@ const LabourCostsSection: FC<LabourCostsSectionPropstype> = ({
         </div>
       </Form>
     </>
+  );
+};
+
+const GenerateInvoice: FC<GenerateInvoiceSectionPropsType> = ({
+  jobDetails,
+  selectedMaterials,
+  addedLabourCosts,
+  vatReducer,
+  changeSection,
+}) => {
+  const vat = Number(vatReducer.vat[0]?.["unit price"]);
+  let invoiceRef = useRef<HTMLDivElement>();
+  const invoiceDetails: InvoiceDetailsType = {
+    ...jobDetails,
+    materials: selectedMaterials,
+    labourCosts: addedLabourCosts,
+    vat,
+  };
+  const onPreviousClick = () => {
+    changeSection("labourCosts");
+  };
+
+  return (
+    <div className={css["generate-invoice"]}>
+      <InvoiceSection
+        invoiceDetails={invoiceDetails}
+        ref={(el) => ((invoiceRef as any) = el)}
+      />
+      <div className={css.actions}>
+        <Button animated primary type="submit" onClick={onPreviousClick}>
+          <Button.Content visible>Previous</Button.Content>
+          <Button.Content hidden>
+            <Icon name="arrow left" />
+          </Button.Content>
+        </Button>
+        <div className={css["sub-actions"]}>
+          <ReactToPrint
+            trigger={() => (
+              <Button icon labelPosition="left" positive>
+                <Icon name="print" />
+                Print
+              </Button>
+            )}
+            content={() => invoiceRef as any}
+          />{" "}
+          <Button icon labelPosition="right" primary>
+            <Icon name="mail" />
+            Send email
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

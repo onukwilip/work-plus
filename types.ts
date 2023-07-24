@@ -191,4 +191,23 @@ export type LabourCostsSectionPropstype = {
 export type CreateOrderSectionNames =
   | "jobDetails"
   | "materials"
-  | "labourCosts";
+  | "labourCosts"
+  | "generateInvoice";
+
+export type GenerateInvoiceSectionPropsType = {
+  jobDetails: JobDetailsType;
+  selectedMaterials: MaterialType[];
+  addedLabourCosts: LabourCostType[];
+  vatReducer: VATReducerType;
+  changeSection: React.Dispatch<React.SetStateAction<CreateOrderSectionNames>>;
+};
+
+export type InvoiceDetailsType = JobDetailsType & {
+  materials: MaterialType[];
+  labourCosts: LabourCostType[];
+  vat: number;
+};
+
+export type InvoicePropsType = {
+  invoiceDetails: InvoiceDetailsType;
+};
