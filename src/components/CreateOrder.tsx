@@ -195,7 +195,7 @@ const CreateOrder = () => {
               className={
                 currentSectionName === section.name ? css["active"] : ""
               }
-              // onClick={() => setCurrentSectionName(section.name)}
+              onClick={() => setCurrentSectionName(section.name)}
             >
               <span>{i + 1}</span> {section.name}
             </li>
